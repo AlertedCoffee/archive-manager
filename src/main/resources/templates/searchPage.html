@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/styles.css}" rel="stylesheet" />
+</head>
+<body>
+
+<form method="GET" th:action="@{/testParser}">
+    <table>
+        <tr>
+            <td><input type="submit" value="Parse"/></td>
+        </tr>
+    </table>
+</form>
+
+<form method="GET" th:action="@{/testParser2}">
+    <table>
+        <tr>
+            <td><input type="submit" value="Parse2"/></td>
+        </tr>
+    </table>
+</form>
+
+<form method="GET" th:action="@{/search}">
+  <table>
+    <tr>
+        <td><label for="search_param">Поиск</label></td>
+        <td><input type="text" id="search_param" th:value="${search_param}" name="search_param" /></td>
+        <td><input type="submit" value="Загрузить" /></td>
+    </tr>
+  </table>
+</form>
+
+
+
+<div th:if="${message}">
+    <p th:text="${message}"></p>
+</div>
+
+</body>
+</html>
