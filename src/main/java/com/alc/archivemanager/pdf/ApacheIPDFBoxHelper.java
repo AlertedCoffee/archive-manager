@@ -1,4 +1,4 @@
-package com.alc.archivemanager.PDF;
+package com.alc.archivemanager.pdf;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -6,10 +6,10 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import java.io.File;
 import java.io.IOException;
 
-public class ApachePDFBoxHelper implements PDFParser {
+public class ApacheIPDFBoxHelper implements IPDFParser {
 
     PDFTextStripper textStripper;
-    public ApachePDFBoxHelper() throws IOException {
+    public ApacheIPDFBoxHelper() throws IOException {
         textStripper = new PDFTextStripper();
     }
 

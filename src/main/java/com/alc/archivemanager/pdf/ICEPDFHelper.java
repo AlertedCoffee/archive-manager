@@ -1,9 +1,8 @@
-package com.alc.archivemanager.PDF;
+package com.alc.archivemanager.pdf;
 
 import org.icepdf.core.pobjects.Document;
-import org.icepdf.core.util.GraphicsRenderingHints;
 
-public class ICEPDFHelper implements PDFParser{
+public class ICEPDFHelper implements IPDFParser {
 
     @Override
     public String Parse(String filePath) {
@@ -15,7 +14,7 @@ public class ICEPDFHelper implements PDFParser{
             StringBuilder text = new StringBuilder();
             for (int i = 0; i < document.getNumberOfPages(); i++) {
                 String pText = document.getPageText(i).toString();
-                text.append(pText);
+                text.append(pText).append("\r\n\r\n");
             }
             return text.toString();
         }
