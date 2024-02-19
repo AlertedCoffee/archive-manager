@@ -9,8 +9,11 @@ import java.io.IOException;
 public class ApacheIPDFBoxHelper implements IPDFParser {
 
     PDFTextStripper textStripper;
-    public ApacheIPDFBoxHelper() throws IOException {
-        textStripper = new PDFTextStripper();
+    public ApacheIPDFBoxHelper() {
+        try {
+            textStripper = new PDFTextStripper();
+        }
+        catch (Exception e){}
     }
 
     @Override
