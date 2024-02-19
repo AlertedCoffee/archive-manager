@@ -1,7 +1,7 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.DeepPavlovApiRequest;
-import com.alc.archivemanager.model.SearchResult;
+import com.alc.archivemanager.model.SearchResultModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.HttpEntity;
@@ -11,17 +11,15 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
 public class DeepPavlovSearcher implements ISearcher{
 
     @Override
-    public SearchResult Search(String text, String searchParam) {
+    public SearchResultModel Search(String text, String searchParam) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
@@ -59,13 +57,13 @@ public class DeepPavlovSearcher implements ISearcher{
                         }
 
                         Object[] responseArray = gson.fromJson(responseString.toString(), Object[].class);
-                        List<SearchResult> searchResults = List.of(
-                                new SearchResult((String) ((List<?>) responseArray[0]).get(0),
+                        List<SearchResultModel> searchResultModels = List.of(
+                                new SearchResultModel((String) ((List<?>) responseArray[0]).get(0),
                                         (double) ((List<?>) responseArray[1]).get(0),
                                         (double) ((List<?>) responseArray[2]).get(0))
                         );
 
-                        return searchResults.get(0);
+                        return searchResultModels.get(0);
                     }
                 }
             }

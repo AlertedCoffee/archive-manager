@@ -7,31 +7,13 @@
 </head>
 <body>
 
-<form method="GET" th:action="@{/testParser}">
-    <table>
-        <tr>
-            <td><input type="submit" value="Parse"/></td>
-        </tr>
-    </table>
-</form>
+<div class="d1">
+    <form method="GET" th:action="@{/search}">
+        <input name="search_param" placeholder="Искать здесь..." th:value="${search_param}" type="search">
+        <button type="submit"></button>
+    </form>
+</div>
 
-<form method="GET" th:action="@{/testParser2}">
-    <table>
-        <tr>
-            <td><input type="submit" value="Parse2"/></td>
-        </tr>
-    </table>
-</form>
-
-<form method="GET" th:action="@{/search}">
-  <table>
-    <tr>
-        <td><label for="search_param">Поиск</label></td>
-        <td><input type="text" id="search_param" th:value="${search_param}" name="search_param" /></td>
-        <td><input type="submit" value="Поиск" /></td>
-    </tr>
-  </table>
-</form>
 
 <div th:if="${search_result}">
     <p th:text="${search_result}"></p>
