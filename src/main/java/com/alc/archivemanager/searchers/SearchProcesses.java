@@ -6,7 +6,6 @@ import com.alc.archivemanager.pdf.ICEPDFHelper;
 import com.alc.archivemanager.pdf.IPDFParser;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class SearchProcesses implements ISearcher{
     private static final String PDF = ".pdf";
 
     @Override
-    public SearchResultModel Search(String text, String searchParam) {
+    public SearchResultModel Search(String fileName, String text, String searchParam) {
         return null;
     }
 
@@ -41,6 +40,7 @@ public class SearchProcesses implements ISearcher{
         return content;
     }
 
+    @Override
     public List<SearchResultModel> PDFSearchProcess(String mainPath, String searchParam){
         File dir = new File(mainPath);
 
@@ -52,7 +52,7 @@ public class SearchProcesses implements ISearcher{
         List<SearchResultModel> searchResults = new ArrayList<>();
         for (String file : files){
             String text = _IPDFParser.Parse(file);
-            searchResults.add(Search(text, searchParam));
+            searchResults.add(Search(file.substring(file.lastIndexOf('\\')+1), text, searchParam));
         }
 
 

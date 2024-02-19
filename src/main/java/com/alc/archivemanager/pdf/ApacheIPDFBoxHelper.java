@@ -20,9 +20,12 @@ public class ApacheIPDFBoxHelper implements IPDFParser {
     public String Parse(String filePath) {
         try {
             PDDocument document = PDDocument.load(new File(filePath));
-            return textStripper.getText(document);
+            String text = textStripper.getText(document);
+            document.close();
+            return text;
         }
-        catch (IOException ex){
+        catch (Exception ex){
+            ex.printStackTrace();
             return null;
         }
     }

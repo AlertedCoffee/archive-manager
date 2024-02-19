@@ -13,14 +13,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
 public class DeepPavlovSearcher extends SearchProcesses{
 
     @Override
-    public SearchResultModel Search(String text, String searchParam) {
+    public SearchResultModel Search(String fileName, String text, String searchParam) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
@@ -58,8 +57,11 @@ public class DeepPavlovSearcher extends SearchProcesses{
                         }
 
                         Object[] responseArray = gson.fromJson(responseString.toString(), Object[].class);
+
+
                         List<SearchResultModel> searchResultModels = List.of(
-                                new SearchResultModel((String) ((List<?>) responseArray[0]).get(0),
+                                new SearchResultModel(fileName,
+                                        GetSubPage(text, (String) ((List<?>) responseArray[0]).get(0)),
                                         (double) ((List<?>) responseArray[1]).get(0),
                                         (double) ((List<?>) responseArray[2]).get(0))
                         );
@@ -73,5 +75,21 @@ public class DeepPavlovSearcher extends SearchProcesses{
         }
 
         return null;
+    }
+
+    private String GetSubPage(String text, String template){
+        String[] answerPages = text.split("\r\n\r\n");
+        int findedIndex = 0;
+        for (int i = 0; i < answerPages.length; i++){
+            if(answerPages[i].indexOf(template) != -1)
+                findedIndex = i;
+        }
+
+        return  answerPages[findedIndex];
+    }
+
+    @Override
+    public List<SearchResultModel> PDFSearchProcess(String mainPath, String searchParam) {
+        return super.PDFSearchProcess(mainPath, searchParam);
     }
 }

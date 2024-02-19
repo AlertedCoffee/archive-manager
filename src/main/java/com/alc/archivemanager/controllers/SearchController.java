@@ -9,10 +9,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.naming.directory.SearchResult;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 public class SearchController {
@@ -42,11 +43,9 @@ public class SearchController {
         if(search_param != null && !search_param.isEmpty()){
             model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
 
-            String parsedText = _IPDFParser.Parse("C:/WebPractice/archive-manager/src/main/resources/storage/bf1b1ad8-ac8d-467e-901d-19a7586d21b6.19.201-78 Техническое задание. Требования к содержанию и оформлению.pdf");
-            SearchResultModel searched = _ISearcher.Search(parsedText, search_param);
-            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searched.Answer);
-
-            model.addAttribute(MESSAGE_ATTRIBUTE, parsedText);
+            List<SearchResultModel> searchResult = _ISearcher.PDFSearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
+            searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
+            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
         }
 
         return "/searchPage";

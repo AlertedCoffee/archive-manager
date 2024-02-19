@@ -15,12 +15,11 @@
 </div>
 
 
-<div th:if="${search_result}">
-    <p th:text="${search_result}"></p>
-</div>
 
-<div th:if="${message}">
-    <p th:text="${message}"></p>
+<div th:each="result : ${search_result}">
+    <p>Имя файла: <span th:text="${result.FileName}"></span></p>
+    <p>Страница с ответом: </p> <p th:text="${result.Answer}"></p>
+    <p>Вероятность: <span th:text="${result.Coincidence}"></span></p>
 </div>
 
 </body>
