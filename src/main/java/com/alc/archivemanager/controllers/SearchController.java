@@ -42,10 +42,15 @@ public class SearchController {
 
         if(search_param != null && !search_param.isEmpty()){
             model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
-
+            long start = System.currentTimeMillis();
             List<SearchResultModel> searchResult = _ISearcher.PDFSearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
             searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
             model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
+            long end = System.currentTimeMillis();
+
+            model.addAttribute(MESSAGE_ATTRIBUTE, "Время поиска: " + (end - start) + "мс");
+
+
         }
 
         return "/searchPage";

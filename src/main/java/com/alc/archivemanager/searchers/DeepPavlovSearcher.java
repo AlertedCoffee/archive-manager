@@ -14,18 +14,19 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeepPavlovSearcher extends SearchProcesses{
 
     @Override
-    public SearchResultModel Search(String fileName, String text, String searchParam) {
+    public List<SearchResultModel> Search(List<String> fileName, List<String> text, List<String> searchParam) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
         DeepPavlovApiRequest apiRequest = new DeepPavlovApiRequest(
-                List.of(text),
-                List.of(searchParam)
+                text,
+                searchParam
         );
 
         // Преобразуйте объект запроса в JSON-строку с использованием Gson
@@ -58,23 +59,27 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                         Object[] responseArray = gson.fromJson(responseString.toString(), Object[].class);
 
-                        String[] answerPages = text.split("\r\n\r\n");
-                        int findedIndex = 0;
-                        for (int i = 0; i < answerPages.length; i++){
-                            if(answerPages[i].contains((String) ((List<?>) responseArray[0]).get(0)))
-                                findedIndex = i;
+                        List<SearchResultModel> searchResultModels = new ArrayList<>();
+
+                        for (int i = 0; i < ((List<?>)responseArray[0]).size(); i++){
+                            String[] answerPages = text.get(i).split("\r\n\r\n");
+                            int findedIndex = 0;
+                            for (int j = 0; j < answerPages.length; j++){
+                                if(answerPages[j].contains((String) ((List<?>) responseArray[0]).get(0)))
+                                    findedIndex = j;
+                            }
+
+                            searchResultModels.add(
+                                    new SearchResultModel(fileName.get(i),
+                                            (String) ((List<?>) responseArray[0]).get(i),
+                                            (double) ((List<?>) responseArray[1]).get(i),
+                                            findedIndex + 1,
+                                            answerPages[findedIndex],
+                                            (double) ((List<?>) responseArray[2]).get(i))
+                            );
                         }
 
-                        List<SearchResultModel> searchResultModels = List.of(
-                                new SearchResultModel(fileName,
-                                        (String) ((List<?>) responseArray[0]).get(0),
-                                        (double) ((List<?>) responseArray[1]).get(0),
-                                        findedIndex + 1,
-                                        answerPages[findedIndex],
-                                        (double) ((List<?>) responseArray[2]).get(0))
-                        );
-
-                        return searchResultModels.get(0);
+                        return searchResultModels;
                     }
                 }
             }

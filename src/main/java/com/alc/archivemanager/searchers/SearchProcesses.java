@@ -2,20 +2,19 @@ package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.pdf.ApacheIPDFBoxHelper;
-import com.alc.archivemanager.pdf.ICEPDFHelper;
 import com.alc.archivemanager.pdf.IPDFParser;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchProcesses implements ISearcher{
+public abstract class SearchProcesses implements ISearcher{
 
     private final IPDFParser _IPDFParser = new ApacheIPDFBoxHelper();
     private static final String PDF = ".pdf";
 
     @Override
-    public SearchResultModel Search(String fileName, String text, String searchParam) {
+    public List<SearchResultModel> Search(List<String> fileName, List<String> text, List<String> searchParam) {
         return null;
     }
 
@@ -50,10 +49,17 @@ public class SearchProcesses implements ISearcher{
         List<String> files = new ArrayList<>(getContent(dir));
 
         List<SearchResultModel> searchResults = new ArrayList<>();
+
+        List<String> texts = new ArrayList<>();
+        List<String> searchParams = new ArrayList<>();
         for (String file : files){
-            String text = _IPDFParser.Parse(file);
-            searchResults.add(Search(file.substring(file.lastIndexOf('\\')+1), text, searchParam));
+            texts.add(_IPDFParser.Parse(file));
+            searchParams.add(searchParam);
         }
+
+
+
+        searchResults = Search(files, texts, searchParams);
 
 
         return searchResults;

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ISearcher {
     public List<SearchResultModel> PDFSearchProcess(String mainPath, String searchParam);
-    public SearchResultModel Search(String fileName, String text, String searchParam);
+    public List<SearchResultModel> Search(List<String> fileName, List<String> text, List<String> searchParam);
 }
