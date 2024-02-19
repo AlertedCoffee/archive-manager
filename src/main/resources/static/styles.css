@@ -36,7 +36,11 @@ form {
 }
 
 p {
-    word-break: break-all;
-    white-space: pre-wrap;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.search_res {
+  padding: 5px;
 }
 

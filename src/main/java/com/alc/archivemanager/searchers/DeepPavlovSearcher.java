@@ -58,11 +58,19 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                         Object[] responseArray = gson.fromJson(responseString.toString(), Object[].class);
 
+                        String[] answerPages = text.split("\r\n\r\n");
+                        int findedIndex = 0;
+                        for (int i = 0; i < answerPages.length; i++){
+                            if(answerPages[i].contains((String) ((List<?>) responseArray[0]).get(0)))
+                                findedIndex = i;
+                        }
 
                         List<SearchResultModel> searchResultModels = List.of(
                                 new SearchResultModel(fileName,
-                                        GetSubPage(text, (String) ((List<?>) responseArray[0]).get(0)),
+                                        (String) ((List<?>) responseArray[0]).get(0),
                                         (double) ((List<?>) responseArray[1]).get(0),
+                                        findedIndex + 1,
+                                        answerPages[findedIndex],
                                         (double) ((List<?>) responseArray[2]).get(0))
                         );
 
@@ -75,17 +83,6 @@ public class DeepPavlovSearcher extends SearchProcesses{
         }
 
         return null;
-    }
-
-    private String GetSubPage(String text, String template){
-        String[] answerPages = text.split("\r\n\r\n");
-        int findedIndex = 0;
-        for (int i = 0; i < answerPages.length; i++){
-            if(answerPages[i].indexOf(template) != -1)
-                findedIndex = i;
-        }
-
-        return  answerPages[findedIndex];
     }
 
     @Override
