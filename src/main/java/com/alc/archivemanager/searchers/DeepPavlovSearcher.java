@@ -70,7 +70,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                             }
 
                             searchResultModels.add(
-                                    new SearchResultModel(fileName.get(i),
+                                    new SearchResultModel(fileName.get(i).substring(fileName.get(i).lastIndexOf("\\")+1),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
                                             findedIndex + 1,
