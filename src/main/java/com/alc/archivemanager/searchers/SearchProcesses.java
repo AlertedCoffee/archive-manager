@@ -1,8 +1,8 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.SearchResultModel;
-import com.alc.archivemanager.pdf.ApacheIPDFBoxHelper;
-import com.alc.archivemanager.pdf.IPDFParser;
+import com.alc.archivemanager.parsers.ApacheIBoxHelper;
+import com.alc.archivemanager.parsers.IParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class SearchProcesses implements ISearcher{
 
-    private final IPDFParser _IPDFParser = new ApacheIPDFBoxHelper();
+    private final IParser _IParser = new ApacheIBoxHelper();
     private static final String PDF = ".pdf";
 
     @Override
@@ -53,7 +53,7 @@ public abstract class SearchProcesses implements ISearcher{
         List<String> texts = new ArrayList<>();
         List<String> searchParams = new ArrayList<>();
         for (String file : files){
-            texts.add(_IPDFParser.Parse(file));
+            texts.add(_IParser.Parse(file));
             searchParams.add(searchParam);
         }
 

@@ -1,5 +1,8 @@
 package com.alc.archivemanager;
 
+import com.alc.archivemanager.parsers.ApachePOIHelper;
+import com.alc.archivemanager.parsers.Docx4jHelper;
+import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.SearchProcesses;
 import org.springframework.boot.SpringApplication;

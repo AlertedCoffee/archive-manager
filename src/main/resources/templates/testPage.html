@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/styles.css}" rel="stylesheet" />
+</head>
+<body>
+
+<div class="search_res">
+    <form method="GET" th:action="@{/test}">
+        <button type="submit">Parse</button>
+    </form>
+</div>
+
+<div th:if="${message}" class="search_res">
+    <p th:text="${message}"></p>
+</div>
+
+<div th:if="${search_result}">
+    <p th:text="${search_result}"></p>
+</div>
+
+</body>
+</html>

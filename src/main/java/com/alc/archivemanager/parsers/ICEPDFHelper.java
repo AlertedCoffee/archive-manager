@@ -1,8 +1,8 @@
-package com.alc.archivemanager.pdf;
+package com.alc.archivemanager.parsers;
 
 import org.icepdf.core.pobjects.Document;
 
-public class ICEPDFHelper implements IPDFParser {
+public class ICEPDFHelper implements IParser {
 
     @Override
     public String Parse(String filePath) {

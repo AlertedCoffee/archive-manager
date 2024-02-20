@@ -61,6 +61,27 @@
 
 <!--       PDF              -->
 
+<!--       Docx             -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.docx4j</groupId>
+			<artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+			<version>11.4.9</version>
+		</dependency>
+
+<!--       Docx             -->
+
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>

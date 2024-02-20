@@ -1,7 +1,7 @@
 package com.alc.archivemanager.controllers;
 
 import com.alc.archivemanager.model.SearchResultModel;
-import com.alc.archivemanager.pdf.*;
+import com.alc.archivemanager.parsers.*;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class SearchController {
 
 
 
-    private final IPDFParser _IPDFParser = new ICEPDFHelper();
+    private final IParser _IParser = new ICEPDFHelper();
     private final ISearcher _ISearcher = new DeepPavlovSearcher();
 
 
@@ -54,5 +53,30 @@ public class SearchController {
         }
 
         return "/searchPage";
+    }
+
+    @GetMapping("/test")
+    public String test(Model model,
+                        @ModelAttribute(MESSAGE_ATTRIBUTE) String message
+    ){
+
+        if(message == null || message.isEmpty()) {
+            long start = System.currentTimeMillis();
+
+            IParser iParser = new Docx4jHelper();
+            String text = iParser.Parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.docx");
+
+            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, text);
+            long end = System.currentTimeMillis();
+
+            model.addAttribute(MESSAGE_ATTRIBUTE, "Время парсинга: " + (end - start) + "мс");
+        }
+        else {
+            model.addAttribute(MESSAGE_ATTRIBUTE, message);
+        }
+
+
+
+        return "/testPage";
     }
 }
