@@ -82,6 +82,16 @@
 
 <!--       Docx             -->
 
+<!--	   ODT              -->
+		<dependency>
+			<groupId>org.odftoolkit</groupId>
+			<artifactId>simple-odf</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+
+<!--	   ODT              -->
+
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>

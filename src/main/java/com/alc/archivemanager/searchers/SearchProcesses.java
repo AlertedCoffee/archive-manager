@@ -14,7 +14,7 @@ public abstract class SearchProcesses implements ISearcher{
     private static final String PDF = ".pdf";
 
     @Override
-    public List<SearchResultModel> Search(List<String> fileName, List<String> text, List<String> searchParam) {
+    public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         return null;
     }
 
@@ -40,7 +40,7 @@ public abstract class SearchProcesses implements ISearcher{
     }
 
     @Override
-    public List<SearchResultModel> PDFSearchProcess(String mainPath, String searchParam){
+    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam){
         File dir = new File(mainPath);
 
         if(!dir.exists())

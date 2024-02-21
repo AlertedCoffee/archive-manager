@@ -42,7 +42,7 @@ public class SearchController {
         if(search_param != null && !search_param.isEmpty()){
             model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
             long start = System.currentTimeMillis();
-            List<SearchResultModel> searchResult = _ISearcher.PDFSearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
+            List<SearchResultModel> searchResult = _ISearcher.SearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
             searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
             model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
             long end = System.currentTimeMillis();
@@ -63,8 +63,8 @@ public class SearchController {
         if(message == null || message.isEmpty()) {
             long start = System.currentTimeMillis();
 
-            IParser iParser = new Docx4jHelper();
-            String text = iParser.Parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.docx");
+            IParser iParser = new ApacheODFHelper();
+            String text = iParser.Parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.odt");
 
             model.addAttribute(SEARCH_RESULT_ATTRIBUTE, text);
             long end = System.currentTimeMillis();

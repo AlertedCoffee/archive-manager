@@ -20,13 +20,13 @@ import java.util.List;
 public class DeepPavlovSearcher extends SearchProcesses{
 
     @Override
-    public List<SearchResultModel> Search(List<String> fileName, List<String> text, List<String> searchParam) {
+    public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
         DeepPavlovApiRequest apiRequest = new DeepPavlovApiRequest(
-                text,
-                searchParam
+                texts,
+                searchParams
         );
 
         // Преобразуйте объект запроса в JSON-строку с использованием Gson
@@ -62,7 +62,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                         List<SearchResultModel> searchResultModels = new ArrayList<>();
 
                         for (int i = 0; i < ((List<?>)responseArray[0]).size(); i++){
-                            String[] answerPages = text.get(i).split("\r\n\r\n");
+                            String[] answerPages = texts.get(i).split("\r\n\r\n");
                             int findedIndex = 0;
                             for (int j = 0; j < answerPages.length; j++){
                                 if(answerPages[j].contains((String) ((List<?>) responseArray[0]).get(0)))
@@ -70,7 +70,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                             }
 
                             searchResultModels.add(
-                                    new SearchResultModel(fileName.get(i).substring(fileName.get(i).lastIndexOf("\\")+1),
+                                    new SearchResultModel(fileNames.get(i).substring(fileNames.get(i).lastIndexOf("\\")+1),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
                                             findedIndex + 1,
@@ -84,6 +84,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -91,7 +92,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
     }
 
     @Override
-    public List<SearchResultModel> PDFSearchProcess(String mainPath, String searchParam) {
-        return super.PDFSearchProcess(mainPath, searchParam);
+    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam) {
+        return super.SearchProcess(mainPath, searchParam);
     }
 }
