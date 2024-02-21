@@ -12,34 +12,27 @@ import java.util.List;
 
 public class Docx4jHelper implements IParser{
     @Override
-    public String Parse(String filePath) {
+    public String Parse(String filePath) throws Exception{
 
-        try {
+        WordprocessingMLPackage wordMLPackage = Docx4J.load(new File(filePath));
 
-            WordprocessingMLPackage wordMLPackage = Docx4J.load(new File(filePath));
-
-            // Получите основную часть документа
-            MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+        // Получите основную часть документа
+        MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
 
 
-            StringBuffer df = new StringBuffer();
-            // Итерация по параграфам и извлечение текста
-            for (Object paragraph : documentPart.getContent()) {
-                if (paragraph instanceof org.docx4j.wml.P) {
-                    df.append((org.docx4j.wml.P) paragraph).append("\r\n");
-                    // Здесь вы можете обработать текст параграфа по вашему усмотрению
-                }
+        StringBuffer df = new StringBuffer();
+        // Итерация по параграфам и извлечение текста
+        for (Object paragraph : documentPart.getContent()) {
+            if (paragraph instanceof org.docx4j.wml.P) {
+                df.append((org.docx4j.wml.P) paragraph).append("\r\n");
+                // Здесь вы можете обработать текст параграфа по вашему усмотрению
             }
+        }
 
-            return df.toString();
+        return df.toString();
 
 //            String extractedText = extractTextFromDocx(filePath);
 //            return extractedText;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 
     public static String extractTextFromDocx(String filePath) throws Exception {

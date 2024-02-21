@@ -16,16 +16,10 @@ public class ApacheIBoxHelper implements IParser {
     }
 
     @Override
-    public String Parse(String filePath) {
-        try {
-            PDDocument document = PDDocument.load(new File(filePath));
-            String text = textStripper.getText(document);
-            document.close();
-            return text;
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
+    public String Parse(String filePath) throws Exception{
+        PDDocument document = PDDocument.load(new File(filePath));
+        String text = textStripper.getText(document);
+        document.close();
+        return text;
     }
 }

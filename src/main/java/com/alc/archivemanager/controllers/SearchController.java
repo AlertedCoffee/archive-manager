@@ -58,7 +58,7 @@ public class SearchController {
     @GetMapping("/test")
     public String test(Model model,
                         @ModelAttribute(MESSAGE_ATTRIBUTE) String message
-    ){
+    ) throws Exception {
 
         if(message == null || message.isEmpty()) {
             long start = System.currentTimeMillis();

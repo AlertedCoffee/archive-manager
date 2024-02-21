@@ -7,24 +7,18 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 public class ApachePOIHelper implements IParser {
     @Override
-    public String Parse(String filePath) {
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            XWPFDocument document = new XWPFDocument(fis);
+    public String Parse(String filePath) throws Exception {
+        FileInputStream fis = new FileInputStream(filePath);
+        XWPFDocument document = new XWPFDocument(fis);
 
-            XWPFWordExtractor extractor = new XWPFWordExtractor(document);
-            String text = extractor.getText();
-            fis.close();
+        XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+        String text = extractor.getText();
+        fis.close();
 
-            return text;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return null;
+        return text;
     }
 }
