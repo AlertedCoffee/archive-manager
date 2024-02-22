@@ -61,20 +61,49 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                         List<SearchResultModel> searchResultModels = new ArrayList<>();
 
+                        String[] findedSubString = new String[((List<?>)responseArray[0]).size()];
                         for (int i = 0; i < ((List<?>)responseArray[0]).size(); i++){
-                            String[] answerPages = texts.get(i).split("\r\n\r\n");
-                            int findedIndex = 0;
-                            for (int j = 0; j < answerPages.length; j++){
-                                if(answerPages[j].contains((String) ((List<?>) responseArray[0]).get(0)))
-                                    findedIndex = j;
+
+                            String pattern = (String) ((List<?>) responseArray[0]).get(0);
+
+
+                            String text = texts.get(i);
+
+                            int subStringCoordinate = (int)(double)((List<?>) responseArray[1]).get(0);
+
+                            List<Integer> nIndexes = new ArrayList<>();
+
+                            char targetChar = '\n';
+                            // Ищем индексы символа в строке
+                            for (int j = 0; j < text.length(); j++) {
+                                if (text.charAt(j) == targetChar) {
+                                    nIndexes.add(j);
+                                }
                             }
+                            int lIndex = 1;
+
+                            for (int j = nIndexes.size() - 1; j >= 0; j--) {
+                                if (nIndexes.get(j) < subStringCoordinate) {
+                                    lIndex = nIndexes.get(j);
+                                    break;
+                                }
+                            }
+
+                            int rIndex = text.length();
+                            for (int j = 0; j < nIndexes.size(); j++) {
+                                if (nIndexes.get(j) > subStringCoordinate + pattern.length()) {
+                                    rIndex = nIndexes.get(j);
+                                    break;
+                                }
+                            }
+
+                            findedSubString[i] = text.substring(lIndex, rIndex);
 
                             searchResultModels.add(
                                     new SearchResultModel(fileNames.get(i).substring(fileNames.get(i).lastIndexOf("\\")+1),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
-                                            findedIndex + 1,
-                                            answerPages[findedIndex],
+                                            findedSubString[i],
                                             (double) ((List<?>) responseArray[2]).get(i))
                             );
                         }
@@ -89,6 +118,14 @@ public class DeepPavlovSearcher extends SearchProcesses{
         }
 
         return null;
+    }
+    private String StringFormer(String[] answerPages, int j){
+        if (j > answerPages.length - 1){
+            j -=2;
+        }
+        return answerPages[j + 1] + '\n' + answerPages[j + 2] + '\n' + answerPages[j + 3] + '\n' + answerPages[j + 4] + '\n';
+
+
     }
 
     @Override

@@ -22,7 +22,7 @@
 <div th:each="result : ${search_result}" class="search_res">
     <p>Имя файла: <span th:text="${result.FileName}"></span></p>
     <details>
-        <summary>Ответ на странице <span th:text="${result.Page}"></span>. Кратко: <span th:text="${result.Answer}"></span></summary>
+        <summary>Краткий ответ: <span th:text="${result.Answer}"></span></summary>
         <p th:text="${result.PageText}"></p>
     </details>
     <p>Вероятность: <span th:text="${result.Coincidence}"></span></p>

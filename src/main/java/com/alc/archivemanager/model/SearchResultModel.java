@@ -5,7 +5,6 @@ public class SearchResultModel {
     public String Answer;
     public double Character;
 
-    public int Page;
     public String PageText;
 
     public double getCoincidence() {
@@ -15,11 +14,10 @@ public class SearchResultModel {
     public double Coincidence;
 
 
-    public SearchResultModel(String fileName, String answer, double character, int page, String pageText, double coincidence) {
+    public SearchResultModel(String fileName, String answer, double character, String pageText, double coincidence) {
         FileName = fileName;
         Answer = answer;
         Character = character;
-        Page = page;
         PageText = pageText;
         Coincidence = coincidence;
     }

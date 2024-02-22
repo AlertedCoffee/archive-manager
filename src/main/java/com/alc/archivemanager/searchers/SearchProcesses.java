@@ -1,10 +1,7 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.SearchResultModel;
-import com.alc.archivemanager.parsers.ApacheIBoxHelper;
-import com.alc.archivemanager.parsers.ApacheODFHelper;
-import com.alc.archivemanager.parsers.ApachePOIHelper;
-import com.alc.archivemanager.parsers.IParser;
+import com.alc.archivemanager.parsers.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -57,15 +54,12 @@ public abstract class SearchProcesses implements ISearcher{
 
         for (String file : files){
             try {
-                long start = System.currentTimeMillis();
                 IParser parser = ParserFactory(file);
                 if (parser != null) {
                     texts.add(parser.Parse(file));
                     searchParams.add(searchParam);
                     returnedFiles.add(file);
                 }
-                long end = System.currentTimeMillis();
-                System.out.println(end - start);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -82,7 +76,7 @@ public abstract class SearchProcesses implements ISearcher{
         String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
 
         return switch (extension){
-            case PDF -> new ApacheIBoxHelper();
+            case PDF -> new ICEPDFHelper();
             case DOCX -> new ApachePOIHelper();
             case ODT -> new ApacheODFHelper();
             default -> null;
