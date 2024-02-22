@@ -16,6 +16,9 @@ public class ICEPDFHelper implements IParser {
             String pText = document.getPageText(i).toString();
             text.append(pText).append("\r\n\r\n");
         }
+
+        IParser.SaveParsed(text.toString(), filePath);
+
         return text.toString();
     }
 }

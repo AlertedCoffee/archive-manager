@@ -20,6 +20,7 @@ public class ApacheIBoxHelper implements IParser {
         PDDocument document = PDDocument.load(new File(filePath));
         String text = textStripper.getText(document);
         document.close();
+        IParser.SaveParsed(text, filePath);
         return text;
     }
 }

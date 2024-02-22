@@ -19,6 +19,8 @@ public class ApachePOIHelper implements IParser {
         String text = extractor.getText();
         fis.close();
 
+        IParser.SaveParsed(text, filePath);
+
         return text;
     }
 }

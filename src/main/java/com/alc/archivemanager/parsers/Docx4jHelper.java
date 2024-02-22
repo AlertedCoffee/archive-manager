@@ -29,6 +29,9 @@ public class Docx4jHelper implements IParser{
             }
         }
 
+        IParser.SaveParsed(df.toString(), filePath);
+
+
         return df.toString();
 
 //            String extractedText = extractTextFromDocx(filePath);

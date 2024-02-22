@@ -4,20 +4,31 @@ import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public abstract class SearchProcesses implements ISearcher{
+    public static final String PDF = ".pdf";
+    public static final String DOCX = ".docx";
+    public static final String ODT = ".odt";
+    public static final String TXT = ".txt";
+    public static final String PARSED = ".parsed";
 
-    private final IParser _IParser = new ApacheIBoxHelper();
-    private static final String PDF = ".pdf";
-    private static final String DOCX = ".docx";
-    private static final String ODT = ".odt";
 
     @Override
     public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         return null;
+    }
+
+    private static boolean CheckAttributes(File file, File parsed) throws IOException {
+        BasicFileAttributes parsedAttributes = Files.readAttributes(parsed.toPath(), BasicFileAttributes.class);
+        BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        boolean test = parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
+        return parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
     }
 
     private static List<String> getContent(File file)
@@ -26,7 +37,23 @@ public abstract class SearchProcesses implements ISearcher{
 
 
         if (file.isFile()) {
-            content.add(file.getPath());
+            int dotIndex = file.getPath().lastIndexOf('.');
+            String extension = (dotIndex == -1) ? "" : file.getPath().substring(dotIndex);
+            try {
+                if (!extension.equals(PARSED)) {
+                    File parsed = new File(file.getPath().substring(0, dotIndex) + PARSED);
+
+                    if (parsed.exists() && CheckAttributes(file, parsed)) {
+                        content.add(parsed.getPath());
+                    } else {
+                        content.add(file.getPath());
+                    }
+                }
+            }
+            catch (Exception e){
+                content.add(file.getPath());
+                e.printStackTrace();
+            }
         }
         else {
             File[] SubDirectory = file.listFiles();
@@ -79,6 +106,7 @@ public abstract class SearchProcesses implements ISearcher{
             case PDF -> new ICEPDFHelper();
             case DOCX -> new ApachePOIHelper();
             case ODT -> new ApacheODFHelper();
+            case TXT, PARSED -> new TxtHelper();
             default -> null;
         };
 

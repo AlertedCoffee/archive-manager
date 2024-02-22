@@ -7,13 +7,15 @@ public class ApacheODFHelper implements IParser{
     @Override
     public String Parse(String filePath) throws Exception {
 
-        TextDocument textdoc=(TextDocument)TextDocument.loadDocument(filePath);
+        TextDocument textDoc=(TextDocument)TextDocument.loadDocument(filePath);
 
-        EditableTextExtractor extractorD = EditableTextExtractor.newOdfEditableTextExtractor(textdoc);
+        EditableTextExtractor extractorD = EditableTextExtractor.newOdfEditableTextExtractor(textDoc);
 
-        String output = extractorD.getText();
+        String text = extractorD.getText();
 
-        return output;
+        IParser.SaveParsed(text, filePath);
+
+        return text;
 
     }
 }
