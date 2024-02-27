@@ -24,14 +24,14 @@ public abstract class SearchProcesses implements ISearcher{
         return null;
     }
 
-    private static boolean CheckAttributes(File file, File parsed) throws IOException {
+    protected static boolean CheckAttributes(File file, File parsed) throws IOException {
         BasicFileAttributes parsedAttributes = Files.readAttributes(parsed.toPath(), BasicFileAttributes.class);
         BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         boolean test = parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
         return parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
     }
 
-    private static List<String> getContent(File file)
+    protected static List<String> getContent(File file)
     {
         List<String> content = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public abstract class SearchProcesses implements ISearcher{
         return searchResults;
     }
 
-    private IParser ParserFactory(String fileName){
+    protected IParser ParserFactory(String fileName){
         int dotIndex = fileName.lastIndexOf('.');
         String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
 
