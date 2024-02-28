@@ -2,6 +2,7 @@ package com.alc.archivemanager.controllers;
 
 import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.*;
+import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,7 @@ public class SearchController {
 
 
     private final IParser _IParser = new ICEPDFHelper();
-    private final ISearcher _ISearcher = new DeepPavlovSearcher();
+    private final ISearcher _ISearcher = new ApacheLuceneSearcher();
 
 
     public SearchController() throws IOException {

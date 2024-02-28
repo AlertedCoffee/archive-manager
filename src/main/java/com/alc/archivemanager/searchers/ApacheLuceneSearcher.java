@@ -4,6 +4,7 @@ import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.luceneInfrastructure.LuceneIndexer;
 import org.apache.jena.base.Sys;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -14,6 +15,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.util.automaton.LevenshteinAutomata;
 
 import java.io.File;
@@ -70,12 +72,14 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         return result;
     }
 
-    public List<SearchResultModel> searchInBody(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException {
+    public List<SearchResultModel> searchInBody(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException, InvalidTokenOffsetsException {
         final IndexSearcher indexSearcher = new IndexSearcher(reader);
 
         final QueryParser queryParser = new QueryParser(BODY, new RussianAnalyzer());
         final Query query = queryParser.parse(toSearch);
-        System.out.println("Type of query: " + query.getClass().getSimpleName());
+
+        SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
+        Highlighter highlighter = new Highlighter(htmlFormatter, new QueryScorer(query));
 
         final TopDocs search = indexSearcher.search(query, limit);
         final ScoreDoc[] hits = search.scoreDocs;
@@ -85,9 +89,19 @@ public class ApacheLuceneSearcher extends SearchProcesses{
             final String title = reader.document(hit.doc).get(TITLE);
             final String body = reader.document(hit.doc).get(BODY);
 
+            String text = reader.document(hit.doc).get(BODY);
+            TokenStream tokenStream = TokenSources.getAnyTokenStream(indexSearcher.getIndexReader(), hit.doc, BODY, new RussianAnalyzer());
+            TextFragment[] frag = highlighter.getBestTextFragments(tokenStream, text, false, limit);//highlighter.getBestFragments(tokenStream, text, 3, "...");
+            StringBuilder highlightedText = new StringBuilder();
+            for (TextFragment textFragment : frag) {
+                if ((textFragment != null) && (textFragment.getScore() > 0)) {
+                    highlightedText.append(textFragment).append("\n\n");
+                }
+            }
+
             result.add(new SearchResultModel(
                     title,
-                    body,
+                    highlightedText.toString(),
                     hit.score
             ));
         }

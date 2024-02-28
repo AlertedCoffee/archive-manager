@@ -23,7 +23,7 @@
     <p>Имя файла: <span th:text="${result.getShortFileName()}"></span></p>
     <details>
         <summary>Краткий ответ: <span th:text="${result.Answer}"></span></summary>
-        <p th:text="${result.PageText}"></p>
+        <p th:utext="${result.PageText}"></p>
     </details>
     <p>Вероятность: <span th:text="${result.Coincidence}"></span></p>
 </div>
