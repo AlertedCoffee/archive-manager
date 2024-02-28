@@ -21,11 +21,6 @@ public class LuceneIndexer {
     private final String pathToIndexFolder = "C:/WebPractice/archive-manager/src/main/resources/index/";
 
     /**
-     * Get instance of MessageIndex providing path where indexes will be stored
-     * @param pathToIndexFolder File System path where indexes will be stored. For example /tmp/tutorial_indexes
-     */
-
-    /**
      * Indexing documents using provided Analyzer
      *
      * @param create to decide create new or append to previous one

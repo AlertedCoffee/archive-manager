@@ -4,6 +4,7 @@ import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.luceneInfrastructure.LuceneIndexer;
 import org.apache.jena.base.Sys;
+import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
@@ -11,7 +12,9 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.util.automaton.LevenshteinAutomata;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +23,9 @@ import java.util.List;
 
 public class ApacheLuceneSearcher extends SearchProcesses{
 
-    public static final int DEFAULT_LIMIT = 10;
+    private static final String TITLE = "title";
+    private static final String BODY = "body";
+
 
     private static Document createWith(final String titleStr, final String bodyStr) {
         final Document document = new Document();
@@ -31,36 +36,67 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         textIndexedType.setTokenized(true);
 
         //index title
-        Field title = new Field("title", titleStr, textIndexedType);
+        Field title = new Field(TITLE, titleStr, textIndexedType);
+
         //index body
-        Field body = new Field("body", bodyStr, textIndexedType);
+        Field body = new Field(BODY, bodyStr, textIndexedType);
 
         document.add(title);
         document.add(body);
         return document;
     }
 
-    public void fuzzySearch(final String toSearch, final String searchField, final int limit, final IndexReader reader) throws IOException, ParseException {
-        final IndexSearcher indexSearcher = new IndexSearcher(reader);
 
+    public List<SearchResultModel> fuzzySearch(final String toSearch, final String searchField, final int limit, final IndexReader reader) throws IOException, ParseException {
+        final IndexSearcher indexSearcher = new IndexSearcher(reader);
         final Term term = new Term(searchField, toSearch);
 
-        final int maxEdits = 2; // This is very important variable. It regulates fuzziness of the query
-        final Query query = new FuzzyQuery(term, maxEdits);
+        final Query query = new FuzzyQuery(term);
         final TopDocs search = indexSearcher.search(query, limit);
         final ScoreDoc[] hits = search.scoreDocs;
 
-        System.out.println("\nПараметр поиска: " + toSearch);
+        List<SearchResultModel> result = new ArrayList<>();
         for (ScoreDoc hit : hits) {
-            final String title = reader.document(hit.doc).get("title");
-            final String body = reader.document(hit.doc).get("body");
-            System.out.println("\n\tDocument Id = " + hit.doc + "\n\ttitle = " + title);
+            final String title = reader.document(hit.doc).get(TITLE);
+            final String body = reader.document(hit.doc).get(BODY);
+
+            result.add(new SearchResultModel(
+                    title,
+                    body,
+                    hit.score
+            ));
         }
 
+        return result;
     }
 
-    public void fuzzySearch(final String toSearch, final IndexReader reader) throws IOException, ParseException {
-        fuzzySearch(toSearch, "body", DEFAULT_LIMIT, reader);
+    public List<SearchResultModel> searchInBody(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException {
+        final IndexSearcher indexSearcher = new IndexSearcher(reader);
+
+        final QueryParser queryParser = new QueryParser(BODY, new RussianAnalyzer());
+        final Query query = queryParser.parse(toSearch);
+        System.out.println("Type of query: " + query.getClass().getSimpleName());
+
+        final TopDocs search = indexSearcher.search(query, limit);
+        final ScoreDoc[] hits = search.scoreDocs;
+
+        List<SearchResultModel> result = new ArrayList<>();
+        for (ScoreDoc hit : hits) {
+            final String title = reader.document(hit.doc).get(TITLE);
+            final String body = reader.document(hit.doc).get(BODY);
+
+            result.add(new SearchResultModel(
+                    title,
+                    body,
+                    hit.score
+            ));
+        }
+
+        return result;
+    }
+
+    public List<SearchResultModel> fuzzySearch(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException {
+        return fuzzySearch(toSearch, BODY, limit, reader);
     }
 
     @Override
@@ -72,7 +108,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
 
         List<String> files = new ArrayList<>(getContent(dir));
 
-        List<SearchResultModel> searchResults;
+        List<SearchResultModel> searchResults = new ArrayList<>();
 
         List<Document> documents = new ArrayList<>();
 
@@ -87,13 +123,13 @@ public class ApacheLuceneSearcher extends SearchProcesses{
                 e.printStackTrace();
             }
         }
-        //documents.add(createWith("test", "Мама мыла раму, рамам мыла маму"));
+
 
         long start  = System.currentTimeMillis();
         try {
             LuceneIndexer indexer = new LuceneIndexer();
             indexer.index(true, documents);
-            fuzzySearch(searchParam, indexer.readIndex());
+            searchResults = searchInBody(searchParam, files.size(), indexer.readIndex());
         }
         catch (Exception e){
             e.printStackTrace();
@@ -102,8 +138,6 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         System.out.println(end - start);
 
 
-        //searchResults = Search(returnedFiles, texts, searchParams);
-
-        return null;
+        return searchResults;
     }
 }

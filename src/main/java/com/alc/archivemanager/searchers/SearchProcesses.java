@@ -19,11 +19,6 @@ public abstract class SearchProcesses implements ISearcher{
     public static final String PARSED = ".parsed";
 
 
-    @Override
-    public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
-        return null;
-    }
-
     protected static boolean CheckAttributes(File file, File parsed) throws IOException {
         BasicFileAttributes parsedAttributes = Files.readAttributes(parsed.toPath(), BasicFileAttributes.class);
         BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
@@ -62,40 +57,6 @@ public abstract class SearchProcesses implements ISearcher{
         }
 
         return content;
-    }
-
-    @Override
-    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam){
-        File dir = new File(mainPath);
-
-        if(!dir.exists())
-            return null;
-
-        List<String> files = new ArrayList<>(getContent(dir));
-
-        List<SearchResultModel> searchResults;
-
-        List<String> texts = new ArrayList<>();
-        List<String> searchParams = new ArrayList<>();
-        List<String> returnedFiles = new ArrayList<>();
-
-        for (String file : files){
-            try {
-                IParser parser = ParserFactory(file);
-                if (parser != null) {
-                    texts.add(parser.Parse(file));
-                    searchParams.add(searchParam);
-                    returnedFiles.add(file);
-                }
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        searchResults = Search(returnedFiles, texts, searchParams);
-
-        return searchResults;
     }
 
     protected IParser ParserFactory(String fileName){

@@ -2,6 +2,7 @@ package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.DeepPavlovApiRequest;
 import com.alc.archivemanager.model.SearchResultModel;
+import com.alc.archivemanager.parsers.IParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.HttpEntity;
@@ -13,13 +14,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DeepPavlovSearcher extends SearchProcesses{
 
-    @Override
     public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
@@ -100,7 +101,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                             findedSubString[i] = text.substring(lIndex, rIndex);
 
                             searchResultModels.add(
-                                    new SearchResultModel(fileNames.get(i).substring(fileNames.get(i).lastIndexOf("\\")+1),
+                                    new SearchResultModel(fileNames.get(i),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
                                             findedSubString[i],
@@ -130,6 +131,35 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
     @Override
     public List<SearchResultModel> SearchProcess(String mainPath, String searchParam) {
-        return super.SearchProcess(mainPath, searchParam);
+        File dir = new File(mainPath);
+
+        if(!dir.exists())
+            return null;
+
+        List<String> files = new ArrayList<>(getContent(dir));
+
+        List<SearchResultModel> searchResults;
+
+        List<String> texts = new ArrayList<>();
+        List<String> searchParams = new ArrayList<>();
+        List<String> returnedFiles = new ArrayList<>();
+
+        for (String file : files){
+            try {
+                IParser parser = ParserFactory(file);
+                if (parser != null) {
+                    texts.add(parser.Parse(file));
+                    searchParams.add(searchParam);
+                    returnedFiles.add(file);
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        searchResults = Search(returnedFiles, texts, searchParams);
+
+        return searchResults;
     }
 }

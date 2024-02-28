@@ -10,6 +10,10 @@ public class SearchResultModel {
     public double getCoincidence() {
         return Coincidence;
     }
+    public String getShortFileName(){
+        int index = FileName.indexOf("storage") + 8;
+        return FileName.substring(index, FileName.lastIndexOf('.'));
+    }
 
     public double Coincidence;
 
@@ -18,6 +22,12 @@ public class SearchResultModel {
         FileName = fileName;
         Answer = answer;
         Character = character;
+        PageText = pageText;
+        Coincidence = coincidence;
+    }
+
+    public SearchResultModel(String fileName, String pageText, double coincidence) {
+        FileName = fileName;
         PageText = pageText;
         Coincidence = coincidence;
     }
