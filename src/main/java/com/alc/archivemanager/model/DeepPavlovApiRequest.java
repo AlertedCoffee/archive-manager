@@ -1,31 +1,36 @@
 package com.alc.archivemanager.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class DeepPavlovApiRequest {
-    private List<String> context_raw;
-    private List<String> question_raw;
+    @SerializedName("context_raw")
+    private List<String> contextRaw;
+
+    @SerializedName("question_raw")
+    private List<String> questionRaw;
 
     // Конструктор
-    public DeepPavlovApiRequest(List<String> context_raw, List<String> question_raw) {
-        this.context_raw = context_raw;
-        this.question_raw = question_raw;
+    public DeepPavlovApiRequest(List<String> contextRaw, List<String> questionRaw) {
+        this.contextRaw = contextRaw;
+        this.questionRaw = questionRaw;
     }
 
     // Геттеры и сеттеры
-    public List<String> getContext_raw() {
-        return context_raw;
+    public List<String> getContextRaw() {
+        return contextRaw;
     }
 
-    public void setContext_raw(List<String> context_raw) {
-        this.context_raw = context_raw;
+    public void setContextRaw(List<String> contextRaw) {
+        this.contextRaw = contextRaw;
     }
 
-    public List<String> getQuestion_raw() {
-        return question_raw;
+    public List<String> getQuestionRaw() {
+        return questionRaw;
     }
 
-    public void setQuestion_raw(List<String> question_raw) {
-        this.question_raw = question_raw;
+    public void setQuestionRaw(List<String> questionRaw) {
+        this.questionRaw = questionRaw;
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class LuceneIndexer {
 
-    private final String pathToIndexFolder = "C:/WebPractice/archive-manager/src/main/resources/index/";
+    private final String pathToIndexFolder = System.getProperty("user.dir") + "/src/main/resources/index/";
 
     /**
      * Indexing documents using provided Analyzer

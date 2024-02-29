@@ -2,7 +2,6 @@ package com.alc.archivemanager.parsers;
 
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Text;
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class Docx4jHelper implements IParser{
     @Override
-    public String Parse(String filePath) throws Exception{
+    public String parse(String filePath) throws Exception{
 
         WordprocessingMLPackage wordMLPackage = Docx4J.load(new File(filePath));
 
@@ -29,7 +28,7 @@ public class Docx4jHelper implements IParser{
             }
         }
 
-        IParser.SaveParsed(df.toString(), filePath);
+        IParser.saveParsed(df.toString(), filePath);
 
 
         return df.toString();

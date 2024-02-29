@@ -21,6 +21,6 @@ public class ArchiveManagerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ArchiveManagerApplication.class, args);
 //		ISearcher searcher = new ApacheLuceneSearcher();
-//		searcher.SearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage", "руководство оператора");
+//		searcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage", "руководство оператора");
 	}
 }

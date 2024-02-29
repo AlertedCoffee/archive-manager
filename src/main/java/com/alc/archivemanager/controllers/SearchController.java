@@ -3,6 +3,7 @@ package com.alc.archivemanager.controllers;
 import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.*;
 import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
+import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import org.springframework.stereotype.Controller;
@@ -24,14 +25,15 @@ public class SearchController {
 
 
     private final IParser _IParser = new ICEPDFHelper();
-    private final ISearcher _ISearcher = new ApacheLuceneSearcher();
+    private ISearcher _ISearcher = new ApacheLuceneSearcher();
 
 
     public SearchController() throws IOException {
     }
 
     @GetMapping("/search")
-    public String index(@RequestParam(name = "search_param", required = false) String search_param,
+    public String index(@RequestParam(name = "method", required = false) String method,
+                        @RequestParam(name = "search_param", required = false) String search_param,
                         Model model,
                         @ModelAttribute(MESSAGE_ATTRIBUTE) String message
     ){
@@ -40,10 +42,18 @@ public class SearchController {
             model.addAttribute(MESSAGE_ATTRIBUTE, message);
         }
 
+        if (method!= null && !method.isEmpty()){
+            _ISearcher = switch (method){
+                case "neural" -> new DeepPavlovSearcher();
+                case "combo" -> new ComboSearcher();
+                default -> new ApacheLuceneSearcher();
+            };
+        }
+
         if(search_param != null && !search_param.isEmpty()){
             model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
             long start = System.currentTimeMillis();
-            List<SearchResultModel> searchResult = _ISearcher.SearchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
+            List<SearchResultModel> searchResult = _ISearcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
             searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
             model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
             long end = System.currentTimeMillis();
@@ -65,7 +75,7 @@ public class SearchController {
             long start = System.currentTimeMillis();
 
             IParser iParser = new ApacheODFHelper();
-            String text = iParser.Parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.odt");
+            String text = iParser.parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.odt");
 
             model.addAttribute(SEARCH_RESULT_ATTRIBUTE, text);
             long end = System.currentTimeMillis();

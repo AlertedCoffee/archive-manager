@@ -5,5 +5,5 @@ import com.alc.archivemanager.model.SearchResultModel;
 import java.util.List;
 
 public interface ISearcher {
-    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam);
+    public List<SearchResultModel> searchProcess(String mainPath, String searchParam);
 }

@@ -1,6 +1,5 @@
 package com.alc.archivemanager.searchers;
 
-import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.*;
 
 import java.io.File;
@@ -9,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public abstract class SearchProcesses implements ISearcher{
     public static final String PDF = ".pdf";
@@ -19,7 +17,7 @@ public abstract class SearchProcesses implements ISearcher{
     public static final String PARSED = ".parsed";
 
 
-    protected static boolean CheckAttributes(File file, File parsed) throws IOException {
+    protected static boolean checkAttributes(File file, File parsed) throws IOException {
         BasicFileAttributes parsedAttributes = Files.readAttributes(parsed.toPath(), BasicFileAttributes.class);
         BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         boolean test = parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
@@ -38,7 +36,7 @@ public abstract class SearchProcesses implements ISearcher{
                 if (!extension.equals(PARSED)) {
                     File parsed = new File(file.getPath().substring(0, dotIndex) + PARSED);
 
-                    if (parsed.exists() && CheckAttributes(file, parsed)) {
+                    if (parsed.exists() && checkAttributes(file, parsed)) {
                         content.add(parsed.getPath());
                     } else {
                         content.add(file.getPath());
@@ -59,7 +57,7 @@ public abstract class SearchProcesses implements ISearcher{
         return content;
     }
 
-    protected IParser ParserFactory(String fileName){
+    protected IParser parserFactory(String fileName){
         int dotIndex = fileName.lastIndexOf('.');
         String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
 

@@ -1,14 +1,32 @@
 .d1 {box-sizing: border-box;}
 body{margin: 0;}
-div {padding: 30px 0}
+/* div {padding: 30px 0} */
+.d1 div{
+  width: 400px;
+}
+
+fieldset,
+label {
+  font:
+    1rem 'Fira Sans',
+    sans-serif;
+}
+
 form {
   position: relative;
-  width: 300px;
+  width: 400px;
   margin: 0 auto;
 }
-.d1 {background: #A3D0C3;}
+.main {
+  background: #A3D0C3;
+}
+
+.main div{
+  padding: 30px, 0;
+}
 .d1 input {
-  width: 100%;
+  margin-top: 12%;
+  width: 300px;
   height: 42px;
   padding-left: 10px;
   border: 2px solid #7BA7AB;
@@ -19,8 +37,8 @@ form {
 }
 .d1 button {
   position: absolute;
-  top: 0;
-  right: 0px;
+  top: 36px;
+  right: -135px;
   width: 42px;
   height: 42px;
   border: none;
@@ -33,6 +51,23 @@ form {
   font-family: FontAwesome;
   font-size: 16px;
   color: #F9F0DA;
+}
+
+.rbtn {
+  width: 300px;
+}
+.rbtn fieldset{
+  width: 200px;
+  height: auto;
+  margin-left: -10px;
+}
+
+
+.rbtn input{
+  margin: 0;
+  height: 10px;
+  width: 10px;
+  padding: 0px, 0px;
 }
 
 p {

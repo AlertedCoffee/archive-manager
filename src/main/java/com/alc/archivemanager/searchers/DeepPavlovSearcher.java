@@ -21,7 +21,7 @@ import java.util.List;
 
 public class DeepPavlovSearcher extends SearchProcesses{
 
-    public List<SearchResultModel> Search(List<String> fileNames, List<String> texts, List<String> searchParams) {
+    public List<SearchResultModel> search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
@@ -130,7 +130,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
     }
 
     @Override
-    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam) {
+    public List<SearchResultModel> searchProcess(String mainPath, String searchParam) {
         File dir = new File(mainPath);
 
         if(!dir.exists())
@@ -138,6 +138,10 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
         List<String> files = new ArrayList<>(getContent(dir));
 
+        return searchProcess(files, searchParam);
+    }
+
+    public List<SearchResultModel> searchProcess(List<String> files, String searchParam){
         List<SearchResultModel> searchResults;
 
         List<String> texts = new ArrayList<>();
@@ -146,9 +150,9 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
         for (String file : files){
             try {
-                IParser parser = ParserFactory(file);
+                IParser parser = parserFactory(file);
                 if (parser != null) {
-                    texts.add(parser.Parse(file));
+                    texts.add(parser.parse(file));
                     searchParams.add(searchParam);
                     returnedFiles.add(file);
                 }
@@ -158,7 +162,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
             }
         }
 
-        searchResults = Search(returnedFiles, texts, searchParams);
+        searchResults = search(returnedFiles, texts, searchParams);
 
         return searchResults;
     }

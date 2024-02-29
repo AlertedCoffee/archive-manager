@@ -3,7 +3,6 @@ package com.alc.archivemanager.searchers;
 import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.luceneInfrastructure.LuceneIndexer;
-import org.apache.jena.base.Sys;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.document.Document;
@@ -16,7 +15,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.highlight.*;
-import org.apache.lucene.util.automaton.LevenshteinAutomata;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +27,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
     private static final String BODY = "body";
 
 
-    private static Document createWith(final String titleStr, final String bodyStr) {
+    private static Document createDocument(final String titleStr, final String bodyStr) {
         final Document document = new Document();
 
         final FieldType textIndexedType = new FieldType();
@@ -114,7 +112,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
     }
 
     @Override
-    public List<SearchResultModel> SearchProcess(String mainPath, String searchParam) {
+    public List<SearchResultModel> searchProcess(String mainPath, String searchParam) {
         File dir = new File(mainPath);
 
         if(!dir.exists())
@@ -122,15 +120,19 @@ public class ApacheLuceneSearcher extends SearchProcesses{
 
         List<String> files = new ArrayList<>(getContent(dir));
 
+        return searchProcess(files, searchParam);
+    }
+
+    public List<SearchResultModel> searchProcess(List<String> files, String searchParam) {
         List<SearchResultModel> searchResults = new ArrayList<>();
 
         List<Document> documents = new ArrayList<>();
 
         for (String file : files){
             try {
-                IParser parser = ParserFactory(file);
+                IParser parser = parserFactory(file);
                 if (parser != null) {
-                    documents.add(createWith(file, parser.Parse(file)));
+                    documents.add(createDocument(file, parser.parse(file)));
                 }
             }
             catch (Exception e){

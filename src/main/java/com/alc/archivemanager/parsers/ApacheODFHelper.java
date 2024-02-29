@@ -5,15 +5,15 @@ import org.odftoolkit.simple.common.EditableTextExtractor;
 
 public class ApacheODFHelper implements IParser{
     @Override
-    public String Parse(String filePath) throws Exception {
+    public String parse(String filePath) throws Exception {
 
         TextDocument textDoc=(TextDocument)TextDocument.loadDocument(filePath);
 
-        EditableTextExtractor extractorD = EditableTextExtractor.newOdfEditableTextExtractor(textDoc);
+        EditableTextExtractor extractor = EditableTextExtractor.newOdfEditableTextExtractor(textDoc);
 
-        String text = extractorD.getText();
+        String text = extractor.getText();
 
-        IParser.SaveParsed(text, filePath);
+        IParser.saveParsed(text, filePath);
 
         return text;
 

@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 public class TxtHelper implements IParser{
     @Override
-    public String Parse(String filePath) throws Exception {
+    public String parse(String filePath) throws Exception {
         return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 }

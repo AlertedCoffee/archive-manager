@@ -4,11 +4,10 @@ import com.alc.archivemanager.searchers.SearchProcesses;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 
 public interface IParser {
-    public String Parse(String filePath) throws Exception;
-    public static void SaveParsed(String text, String filePath) throws Exception{
+    public String parse(String filePath) throws Exception;
+    public static void saveParsed(String text, String filePath) throws Exception{
         int dotIndex = filePath.lastIndexOf('.');
         filePath = filePath.substring(0, dotIndex) + SearchProcesses.PARSED;
 

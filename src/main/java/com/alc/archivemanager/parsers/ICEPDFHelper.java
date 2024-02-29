@@ -2,12 +2,10 @@ package com.alc.archivemanager.parsers;
 
 import org.icepdf.core.pobjects.Document;
 
-import java.util.concurrent.ExecutionException;
-
 public class ICEPDFHelper implements IParser {
 
     @Override
-    public String Parse(String filePath) throws Exception {
+    public String parse(String filePath) throws Exception {
         Document document = new Document();
         document.setFile(filePath);
 
@@ -17,7 +15,7 @@ public class ICEPDFHelper implements IParser {
             text.append(pText).append("\r\n\r\n");
         }
 
-        IParser.SaveParsed(text.toString(), filePath);
+        IParser.saveParsed(text.toString(), filePath);
 
         return text.toString();
     }
