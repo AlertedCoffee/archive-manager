@@ -141,7 +141,6 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         }
 
 
-        long start  = System.currentTimeMillis();
         try {
             LuceneIndexer indexer = new LuceneIndexer();
             indexer.index(true, documents);
@@ -150,8 +149,6 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         catch (Exception e){
             e.printStackTrace();
         }
-        long end  = System.currentTimeMillis();
-        System.out.println(end - start);
 
 
         return searchResults;

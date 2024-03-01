@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/styles.css}" rel="stylesheet" />
+   <!-- <link href="../static/styles.css" rel="stylesheet" /> -->
+</head>
+<body>
+
+<div class="main">
+    <form method="GET" th:action="@{/search}" style="display: flex;">
+        <div class="rbtn">
+            <fieldset>
+                <legend>Выберите режим поиска</legend>
+
+                <div>
+                    <input type="radio" id="apache" name="method" value="apache" checked />
+                    <label for="apache">Классический</label>
+                </div>
+
+                <div>
+                    <input type="radio" id="neural" name="method" value="neural" />
+                    <label for="neural">Нейронный</label>
+                </div>
+
+                <div>
+                    <input type="radio" id="combo" name="method" value="combo" />
+                    <label for="combo">Комбинированный</label>
+                </div>
+            </fieldset>
+        </div>
+        <div class="d1">
+            <input name="search_param" placeholder="Искать здесь..." th:value="${search_param}" type="search">
+            <button type="submit"></button>
+        </div>
+    </form>
+</div>
+
+<div th:if="${message}">
+    <p th:text="${message}"></p>
+</div>
+
+
+<div th:each="result : ${search_result}" class="search_res">
+    <p>Имя файла: <span th:text="${result.getShortFileName()}"></span></p>
+    <details>
+        <summary>Краткий ответ: <span th:text="${result.Answer}"></span></summary>
+        <p th:utext="${result.PageText}"></p>
+    </details>
+    <p>Вероятность: <span th:text="${result.Coincidence}"></span></p>
+</div>
+
+</body>
+</html>

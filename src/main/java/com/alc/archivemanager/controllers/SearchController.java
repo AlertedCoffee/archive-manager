@@ -33,35 +33,34 @@ public class SearchController {
 
     @GetMapping("/search")
     public String index(@RequestParam(name = "method", required = false) String method,
-                        @RequestParam(name = "search_param", required = false) String search_param,
-                        Model model,
-                        @ModelAttribute(MESSAGE_ATTRIBUTE) String message
+                        @RequestParam(name = "search_param", required = false) String search_param
+//                        Model model,
+//                        @ModelAttribute(MESSAGE_ATTRIBUTE) String message
     ){
 
-        if(message != null && !message.isEmpty()) {
-            model.addAttribute(MESSAGE_ATTRIBUTE, message);
-        }
-
-        if (method!= null && !method.isEmpty()){
-            _ISearcher = switch (method){
-                case "neural" -> new DeepPavlovSearcher();
-                case "combo" -> new ComboSearcher();
-                default -> new ApacheLuceneSearcher();
-            };
-        }
-
-        if(search_param != null && !search_param.isEmpty()){
-            model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
-            long start = System.currentTimeMillis();
-            List<SearchResultModel> searchResult = _ISearcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
-            searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
-            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
-            long end = System.currentTimeMillis();
-
-            model.addAttribute(MESSAGE_ATTRIBUTE, "Время поиска: " + (end - start) + "мс");
-
-
-        }
+//        if(message != null && !message.isEmpty()) {
+//            model.addAttribute(MESSAGE_ATTRIBUTE, message);
+//        }
+//
+//        _ISearcher = switch (method){
+//            case "neural" -> new DeepPavlovSearcher();
+//            case "combo" -> new ComboSearcher();
+//            default -> new ApacheLuceneSearcher();
+//        };
+//
+//
+//        if(search_param != null && !search_param.isEmpty()){
+//            model.addAttribute(SEARCH_PARAM_ATTRIBUTE, search_param);
+//            long start = System.currentTimeMillis();
+//            List<SearchResultModel> searchResult = _ISearcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
+//            searchResult.sort(Comparator.comparingDouble(SearchResultModel::getCoincidence).reversed());
+//            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, searchResult);
+//            long end = System.currentTimeMillis();
+//
+//            model.addAttribute(MESSAGE_ATTRIBUTE, "Время поиска: " + (end - start) + "мс");
+//
+//
+//        }
 
         return "/searchPage";
     }

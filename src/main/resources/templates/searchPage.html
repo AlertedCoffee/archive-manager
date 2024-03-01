@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <link th:href="@{/styles.css}" rel="stylesheet" />
-   <!-- <link href="../static/styles.css" rel="stylesheet" /> -->
+    <!-- <link href="../static/styles.css" rel="stylesheet" /> -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
 
 <div class="main">
-    <form method="GET" th:action="@{/search}" style="display: flex;">
+    <form method="GET" th:action="@{/api/search}" style="display: flex;">
         <div class="rbtn">
             <fieldset>
                 <legend>Выберите режим поиска</legend>
@@ -32,24 +33,65 @@
         </div>
         <div class="d1">
             <input name="search_param" placeholder="Искать здесь..." th:value="${search_param}" type="search">
-            <button type="submit"></button>
+            <button id="btn" type="submit"></button>
         </div>
     </form>
 </div>
 
-<div th:if="${message}">
-    <p th:text="${message}"></p>
-</div>
+<div class="loading-spinner"></div>
 
-
-<div th:each="result : ${search_result}" class="search_res">
-    <p>Имя файла: <span th:text="${result.getShortFileName()}"></span></p>
-    <details>
-        <summary>Краткий ответ: <span th:text="${result.Answer}"></span></summary>
-        <p th:utext="${result.PageText}"></p>
-    </details>
-    <p>Вероятность: <span th:text="${result.Coincidence}"></span></p>
-</div>
+<div id="search-results"></div>
 
 </body>
+<script>
+    $(document).ready(function() {
+        $('form').submit(function(event) {
+            event.preventDefault();
+
+            // Блокировка кнопки
+            let btn = document.getElementById("btn");
+            btn.disabled = true; 
+
+            var form = $(this);
+            var formData = form.serialize();
+
+            // Отобразить колесо загрузки
+            $('.loading-spinner').show();
+
+            // Отправить AJAX-запрос на бэкенд
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Скрыть колесо загрузки
+                    $('.loading-spinner').hide();
+
+                    // Очистить текущие результаты
+                    $('#search-results').empty();
+
+                    // Обработать полученные результаты
+                    response.forEach(function(result) {
+                        var resultElement = $('<div class="search_res"></div>');
+                        resultElement.append('<p>Имя файла: <span>' + result.shortFileName + '</span></p>');
+                        resultElement.append('<details><summary>Краткий ответ: <span>' + (result.Answer ? result.Answer : "") + '</span></summary><p>' + result.PageText + '</p></details>');
+                        resultElement.append('<p>Вероятность: <span>' + result.Coincidence + '</span></p>');
+
+                        // Добавить результат в контейнер для результатов поиска
+                        $('#search-results').append(resultElement);
+                    });
+                    btn.disabled = false;
+                },
+                error: function(error) {
+                    // Скрыть колесо загрузки в случае ошибки
+                    $('.loading-spinner').hide();
+                    console.error('Error:', error);
+                    btn.disabled = false;
+                }
+            });
+
+            
+        });
+    });
+</script>
 </html>
