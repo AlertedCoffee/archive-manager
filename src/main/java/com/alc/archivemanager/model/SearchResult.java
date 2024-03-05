@@ -1,6 +1,6 @@
 package com.alc.archivemanager.model;
 
-public class SearchResultModel {
+public class SearchResult {
     public String FileName;
     public String Answer;
     public double Character;
@@ -18,7 +18,7 @@ public class SearchResultModel {
     public double Coincidence;
 
 
-    public SearchResultModel(String fileName, String answer, double character, String pageText, double coincidence) {
+    public SearchResult(String fileName, String answer, double character, String pageText, double coincidence) {
         FileName = fileName;
         Answer = answer;
         Character = character;
@@ -26,7 +26,7 @@ public class SearchResultModel {
         Coincidence = coincidence;
     }
 
-    public SearchResultModel(String fileName, String pageText, double coincidence) {
+    public SearchResult(String fileName, String pageText, double coincidence) {
         FileName = fileName;
         PageText = pageText;
         Coincidence = coincidence;

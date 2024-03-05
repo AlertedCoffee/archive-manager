@@ -1,7 +1,7 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.DeepPavlovApiRequest;
-import com.alc.archivemanager.model.SearchResultModel;
+import com.alc.archivemanager.model.SearchResult;
 import com.alc.archivemanager.parsers.IParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class DeepPavlovSearcher extends SearchProcesses{
 
-    public List<SearchResultModel> search(List<String> fileNames, List<String> texts, List<String> searchParams) {
+    public List<SearchResult> search(List<String> fileNames, List<String> texts, List<String> searchParams) {
         String apiUrl = "http://127.0.0.1:5088/model";
 
 
@@ -60,7 +60,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                         Object[] responseArray = gson.fromJson(responseString.toString(), Object[].class);
 
-                        List<SearchResultModel> searchResultModels = new ArrayList<>();
+                        List<SearchResult> searchResults = new ArrayList<>();
 
                         String[] findedSubString = new String[((List<?>)responseArray[0]).size()];
                         for (int i = 0; i < ((List<?>)responseArray[0]).size(); i++){
@@ -100,8 +100,8 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                             findedSubString[i] = text.substring(lIndex, rIndex);
 
-                            searchResultModels.add(
-                                    new SearchResultModel(fileNames.get(i),
+                            searchResults.add(
+                                    new SearchResult(fileNames.get(i),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
                                             findedSubString[i],
@@ -109,7 +109,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
                             );
                         }
 
-                        return searchResultModels;
+                        return searchResults;
                     }
                 }
             }
@@ -130,7 +130,7 @@ public class DeepPavlovSearcher extends SearchProcesses{
     }
 
     @Override
-    public List<SearchResultModel> searchProcess(String mainPath, String searchParam) {
+    public List<SearchResult> searchProcess(String mainPath, String searchParam) {
         File dir = new File(mainPath);
 
         if(!dir.exists())
@@ -141,8 +141,8 @@ public class DeepPavlovSearcher extends SearchProcesses{
         return searchProcess(files, searchParam);
     }
 
-    public List<SearchResultModel> searchProcess(List<String> files, String searchParam){
-        List<SearchResultModel> searchResults;
+    public List<SearchResult> searchProcess(List<String> files, String searchParam){
+        List<SearchResult> searchResults;
 
         List<String> texts = new ArrayList<>();
         List<String> searchParams = new ArrayList<>();

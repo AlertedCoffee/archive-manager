@@ -1,10 +1,7 @@
 package com.alc.archivemanager.controllers;
 
-import com.alc.archivemanager.model.SearchResultModel;
 import com.alc.archivemanager.parsers.*;
 import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
-import com.alc.archivemanager.searchers.ComboSearcher;
-import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +10,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
 
 @Controller
 public class SearchController {

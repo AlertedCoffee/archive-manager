@@ -1,6 +1,6 @@
 package com.alc.archivemanager.searchers;
 
-import com.alc.archivemanager.model.SearchResultModel;
+import com.alc.archivemanager.model.SearchResult;
 import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.luceneInfrastructure.LuceneIndexer;
 import org.apache.lucene.analysis.TokenStream;
@@ -47,7 +47,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
     }
 
 
-    public List<SearchResultModel> fuzzySearch(final String toSearch, final String searchField, final int limit, final IndexReader reader) throws IOException, ParseException {
+    public List<SearchResult> fuzzySearch(final String toSearch, final String searchField, final int limit, final IndexReader reader) throws IOException, ParseException {
         final IndexSearcher indexSearcher = new IndexSearcher(reader);
         final Term term = new Term(searchField, toSearch);
 
@@ -55,12 +55,12 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         final TopDocs search = indexSearcher.search(query, limit);
         final ScoreDoc[] hits = search.scoreDocs;
 
-        List<SearchResultModel> result = new ArrayList<>();
+        List<SearchResult> result = new ArrayList<>();
         for (ScoreDoc hit : hits) {
             final String title = reader.document(hit.doc).get(TITLE);
             final String body = reader.document(hit.doc).get(BODY);
 
-            result.add(new SearchResultModel(
+            result.add(new SearchResult(
                     title,
                     body,
                     hit.score
@@ -70,7 +70,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         return result;
     }
 
-    public List<SearchResultModel> searchInBody(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException, InvalidTokenOffsetsException {
+    public List<SearchResult> searchInBody(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException, InvalidTokenOffsetsException {
         final IndexSearcher indexSearcher = new IndexSearcher(reader);
 
         final QueryParser queryParser = new QueryParser(BODY, new RussianAnalyzer());
@@ -82,7 +82,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         final TopDocs search = indexSearcher.search(query, limit);
         final ScoreDoc[] hits = search.scoreDocs;
 
-        List<SearchResultModel> result = new ArrayList<>();
+        List<SearchResult> result = new ArrayList<>();
         for (ScoreDoc hit : hits) {
             final String title = reader.document(hit.doc).get(TITLE);
             final String body = reader.document(hit.doc).get(BODY);
@@ -97,7 +97,7 @@ public class ApacheLuceneSearcher extends SearchProcesses{
                 }
             }
 
-            result.add(new SearchResultModel(
+            result.add(new SearchResult(
                     title,
                     highlightedText.toString(),
                     hit.score
@@ -107,12 +107,12 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         return result;
     }
 
-    public List<SearchResultModel> fuzzySearch(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException {
+    public List<SearchResult> fuzzySearch(final String toSearch, final int limit, final IndexReader reader) throws IOException, ParseException {
         return fuzzySearch(toSearch, BODY, limit, reader);
     }
 
     @Override
-    public List<SearchResultModel> searchProcess(String mainPath, String searchParam) {
+    public List<SearchResult> searchProcess(String mainPath, String searchParam) {
         File dir = new File(mainPath);
 
         if(!dir.exists())
@@ -123,8 +123,8 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         return searchProcess(files, searchParam);
     }
 
-    public List<SearchResultModel> searchProcess(List<String> files, String searchParam) {
-        List<SearchResultModel> searchResults = new ArrayList<>();
+    public List<SearchResult> searchProcess(List<String> files, String searchParam) {
+        List<SearchResult> searchResults = new ArrayList<>();
 
         List<Document> documents = new ArrayList<>();
 

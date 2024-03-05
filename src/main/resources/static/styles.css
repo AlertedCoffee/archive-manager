@@ -98,3 +98,12 @@ p {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+.fs-item{
+  cursor: pointer;
+}
+
+.fs-item :hover{
+  background: #7BA7AB;
+}

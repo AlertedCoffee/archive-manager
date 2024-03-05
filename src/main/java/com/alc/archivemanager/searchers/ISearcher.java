@@ -1,9 +1,9 @@
 package com.alc.archivemanager.searchers;
 
-import com.alc.archivemanager.model.SearchResultModel;
+import com.alc.archivemanager.model.SearchResult;
 
 import java.util.List;
 
 public interface ISearcher {
-    public List<SearchResultModel> searchProcess(String mainPath, String searchParam);
+    public List<SearchResult> searchProcess(String mainPath, String searchParam);
 }

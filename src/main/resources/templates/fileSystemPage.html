@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/styles.css}" rel="stylesheet" />
+    <!-- <link href="../static/styles.css" rel="stylesheet" /> -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body onload="start()">
+
+<table>
+    <thead>
+        <tr>
+            <td>
+                Тип
+            </td>
+            <td>
+                Имя файла
+            </td>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+</table>
+
+</body>
+</html>
+
+<script>
+    function start() {
+        ajaxRequest(null);
+    }
+
+    function ajaxRequest(path){
+        $.ajax({
+          url: '/api/get_files',
+          dataType:'json',
+          type:'GET',
+          data: {"main_path":path },
+          success: function (data) {
+            showData(data);
+          },
+          error: function (data) {
+            console.error('Error:', data);
+          }
+        });
+    }
+
+    function showData(data) {
+        let index = 1;
+        const tbody = document.getElementById("tbody");
+        $('tbody').empty();
+
+        if(data.length != 0){
+            if(data[0].parent != null){
+                let newPath = data[0].parent.substring(0, data[0].parent.lastIndexOf('\\'));
+                tbody.append(addRow('..', "DIR", newPath, ""));
+            }
+        }
+
+        data.forEach(element => {
+            if(element.fileType != "PARSED"){
+                let row = addRow(element.name, element.fileType, element.path, element.parent); 
+                tbody.append(row);
+            }
+        });
+    }
+
+    function addRow(name, fileType, path, parent){
+        const row = document.createElement('tr');
+                const fileName = document.createElement("td");
+                fileName.innerHTML = name;
+                const extension = document.createElement("td");
+                extension.innerHTML = fileType;
+                row.setAttribute("path", path);
+                row.setAttribute("class", "fs-item");
+                if(fileType == "DIR"){
+                    row.setAttribute("ondblclick", "openDir(this)");
+                }
+
+                row.append(extension);
+                row.append(fileName);
+        
+        return row;
+    }
+
+    function openDir(element){
+        ajaxRequest(element.getAttribute("path"));
+    }
+</script>

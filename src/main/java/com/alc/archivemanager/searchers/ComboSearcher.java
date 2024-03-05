@@ -1,20 +1,19 @@
 package com.alc.archivemanager.searchers;
 
-import com.alc.archivemanager.model.DeepPavlovApiRequest;
-import com.alc.archivemanager.model.SearchResultModel;
+import com.alc.archivemanager.model.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComboSearcher implements ISearcher{
     @Override
-    public List<SearchResultModel> searchProcess(String mainPath, String searchParam) {
+    public List<SearchResult> searchProcess(String mainPath, String searchParam) {
         ApacheLuceneSearcher apache = new ApacheLuceneSearcher();
-        List<SearchResultModel> apacheResult = apache.searchProcess(mainPath, searchParam);
+        List<SearchResult> apacheResult = apache.searchProcess(mainPath, searchParam);
 
 
         double max = apacheResult.stream()
-                .mapToDouble(SearchResultModel::getCoincidence)
+                .mapToDouble(SearchResult::getCoincidence)
                 .max()
                 .orElse(Double.MIN_VALUE);
         if (max > 0.7){
@@ -25,9 +24,9 @@ public class ComboSearcher implements ISearcher{
         DeepPavlovSearcher pavlov = new DeepPavlovSearcher();
 
         List<String> files = new ArrayList<>();
-        for(SearchResultModel result : apacheResult) files.add(result.FileName);
+        for(SearchResult result : apacheResult) files.add(result.FileName);
 
-        List<SearchResultModel> pavlovResult = pavlov.searchProcess(files, searchParam);
+        List<SearchResult> pavlovResult = pavlov.searchProcess(files, searchParam);
 
 //        List<SearchResultModel> result = new ArrayList<>();
 //
