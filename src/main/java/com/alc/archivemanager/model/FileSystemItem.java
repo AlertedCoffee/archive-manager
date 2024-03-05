@@ -32,7 +32,7 @@ public class FileSystemItem {
     }
 
     public String getName() {
-        return path.substring(path.lastIndexOf("storage") + 8);
+        return path.substring(path.lastIndexOf("\\") + 1);
     }
 
     public String getPath() {

@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link th:href="@{/styles.css}" rel="stylesheet" />
-    <!-- <link href="../static/styles.css" rel="stylesheet" /> -->
+    <link th:href="@{/fileExplorer.css}" rel="stylesheet" />
+    <link th:href="@{/addFile.css}" rel="stylesheet" />
+    <!-- <link href="../static/fileExplorer.css" rel="stylesheet" /> -->
+    <!-- <link href="../static/addFile.css" rel="stylesheet" /> -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body onload="start()">
+<header class="header">
+    <div><button class="" onclick="showUploadForm()">Загрузить файл</button></div>
+</header>
+
+<div id="overlay">
+    <div id="upload-form">
+        <span id="close-btn" onclick="closeUploadForm()">&times;</span>
+        <h2>Загрузка файла</h2>
+        <form id="uploadFileForm" action="/api/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="fileInput" required>
+            <br>
+            <input type="button" value="Загрузить" onclick="uploadFile()">
+        </form>
+    </div>
+</div>
 
 <table>
     <thead>
@@ -58,10 +75,11 @@
                 let newPath = data[0].parent.substring(0, data[0].parent.lastIndexOf('\\'));
                 tbody.append(addRow('..', "DIR", newPath, ""));
             }
+            tbody.setAttribute("parent", data[0].parent) + '\\';
         }
 
         data.forEach(element => {
-            if(element.fileType != "PARSED"){
+            if(element.fileType != "PARSED" && element.fileType != "SHADOW"){
                 let row = addRow(element.name, element.fileType, element.path, element.parent); 
                 tbody.append(row);
             }
@@ -88,5 +106,63 @@
 
     function openDir(element){
         ajaxRequest(element.getAttribute("path"));
+    }
+
+    function showUploadForm() {
+        let form = document.getElementById('overlay');
+        form.style.display = 'flex';
+    }
+
+    function closeUploadForm() {
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function uploadFile() {
+        // Получаем форму и ее данные
+        var form = document.getElementById("uploadFileForm");
+        var formData = new FormData(form);
+
+        // Получаем значение атрибута parent у tbody
+        var parentAttribute = document.getElementById("tbody").getAttribute("parent") + '\\';
+
+        // Проверяем, было ли передано место для сохранения файла
+        if (parentAttribute == "null") {
+            formData.append("destination", null);  
+        }
+        else{
+            formData.append("destination", parentAttribute);
+        }
+
+        // Добавляем значение атрибута parent к formData в качестве destination
+
+        // Опции запроса
+        var options = {
+            method: 'POST',
+            body: formData
+        };
+
+        // Замените URL на ваш API endpoint
+        var apiUrl = '/api/upload';
+
+        // Отправляем запрос с использованием Fetch API
+        fetch(apiUrl, options)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Ошибка загрузки файла');
+                }
+            })
+            .then(data => {
+                // Обработка успешного ответа
+                console.log('Файл успешно загружен:', data);
+                closeUploadForm();
+                if(parentAttribute == "null") ajaxRequest();
+                else ajaxRequest(parentAttribute);
+            })
+            .catch(error => {
+                // Обработка ошибок
+                console.error('Произошла ошибка:', error.message);
+            });
     }
 </script>
