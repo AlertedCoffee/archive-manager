@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +27,7 @@ public class RestApiController {
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam(name = "method", required = false) String method,
-                                     @RequestParam(name = "search_param", required = false) String search_param) throws Exception {
+                                     @RequestParam("search_param") String search_param) throws Exception {
 
         if(search_param == null || search_param.isEmpty()) throw new Exception("Параметр поиска не задан");
 
@@ -77,6 +78,38 @@ public class RestApiController {
             return new ResponseEntity<>("Файл успешно загружен.", HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>("Ошибка при загрузке файла: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/create_folder")
+    public ResponseEntity<String> createFolder(@RequestParam("folder_name") String folderName,
+                                               @RequestParam("destination") String destination) {
+        String fullPath;
+        if (destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
+        if (destination.isEmpty() || destination.equals("null")) {
+            fullPath = MAIN_PATH + STORAGE_SUFFIX;
+        }
+        else fullPath  = MAIN_PATH + destination;
+        fullPath += "/" + folderName;
+
+        try {
+            // Создание папки
+            File folder = new File(fullPath);
+            if (!folder.exists()) {
+                if (folder.mkdirs()) {
+                    return ResponseEntity.ok("Папка успешно создана.");
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Не удалось создать папку.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Папка уже существует.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Произошла ошибка при создании папки. " + e.getMessage());
         }
     }
 }

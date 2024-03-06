@@ -34,10 +34,17 @@ tbody tr:hover {
     cursor: pointer;
 }
 
-.upload-btn{
-    width: 100px;
+.nav-btn{
+    width: 50px;
     height: 50px;
     border: none;
-    background-image: url('../static/icons/upload.png');
     background-size: cover;
+}
+
+.upload-ico{
+    background-image: url('/icons/upload.png');
+}
+
+.create-folder-ico{
+    background-image: url('/icons/create-folder.png');
 }

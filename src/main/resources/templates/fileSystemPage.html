@@ -11,17 +11,30 @@
 </head>
 <body onload="start()">
 <header class="header">
-    <div><button class="" onclick="showUploadForm()">Загрузить файл</button></div>
+    <div><button class="nav-btn upload-ico" onclick="showForm('upload_overlay')"></button>
+        <button class="nav-btn create-folder-ico" onclick="showForm('create_folder_overlay')"></button></div>
 </header>
 
-<div id="overlay">
-    <div id="upload-form">
-        <span id="close-btn" onclick="closeUploadForm()">&times;</span>
+<div id="upload_overlay" class="overlay">
+    <div id="upload-form" class="form">
+        <span id="close-btn" class="close-btn" onclick="closeForm('upload_overlay')">&times;</span>
         <h2>Загрузка файла</h2>
         <form id="uploadFileForm" action="/api/upload" method="post" enctype="multipart/form-data">
             <input type="file" name="file" id="fileInput" required>
             <br>
             <input type="button" value="Загрузить" onclick="uploadFile()">
+        </form>
+    </div>
+</div>
+
+<div id="create_folder_overlay" class="overlay">
+    <div id="create-folder-form" class="form">
+        <span id="close-btn" class="close-btn" onclick="closeForm('create_folder_overlay')">&times;</span>
+        <h2>Создать папку</h2>
+        <form id="createFolderForm" action="/api/create_folder" method="post" enctype="multipart/form-data">
+            <input type="text" name="folder_name" value="Новая папка" id="folderName" required>
+            <br>
+            <input type="button" value="Создать" onclick="addFolder()">
         </form>
     </div>
 </div>
@@ -66,7 +79,6 @@
     }
 
     function showData(data) {
-        let index = 1;
         const tbody = document.getElementById("tbody");
         $('tbody').empty();
 
@@ -108,13 +120,13 @@
         ajaxRequest(element.getAttribute("path"));
     }
 
-    function showUploadForm() {
-        let form = document.getElementById('overlay');
-        form.style.display = 'flex';
+    function showForm(name) {
+        document.getElementById(name).style.display = 'flex';
     }
 
-    function closeUploadForm() {
-        document.getElementById('overlay').style.display = 'none';
+
+    function closeForm(name) {
+        document.getElementById(name).style.display = 'none';
     }
 
     function uploadFile() {
@@ -126,7 +138,7 @@
         var parentAttribute = document.getElementById("tbody").getAttribute("parent") + '\\';
 
         // Проверяем, было ли передано место для сохранения файла
-        if (parentAttribute == "null") {
+        if (parentAttribute == "null\\") {
             formData.append("destination", null);  
         }
         else{
@@ -155,8 +167,59 @@
             .then(data => {
                 // Обработка успешного ответа
                 console.log('Файл успешно загружен:', data);
-                closeUploadForm();
-                if(parentAttribute == "null") ajaxRequest();
+                closeForm('upload_overlay');
+                if(parentAttribute == "null\\") ajaxRequest("");
+                else ajaxRequest(parentAttribute);
+            })
+            .catch(error => {
+                // Обработка ошибок
+                console.error('Произошла ошибка:', error.message);
+            });
+    }
+
+    function addFolder() {
+        // Получаем форму и ее данные
+        var form = document.getElementById("createFolderForm");
+        var formData = new FormData(form);
+
+        // Получаем значение атрибута parent у tbody
+        var parentAttribute = document.getElementById("tbody").getAttribute("parent") + '\\';
+
+        // Проверяем, было ли передано место для сохранения файла
+        if (parentAttribute == "null\\") {
+            formData.append("destination", null);  
+        }
+        else{
+            formData.append("destination", parentAttribute);
+        }
+
+
+        // Опции запроса
+        var options = {
+            method: 'POST',
+            body: formData
+        };
+
+        // Замените URL на ваш API endpoint
+        var apiUrl = '/api/create_folder';
+
+        // Отправляем запрос с использованием Fetch API
+        fetch(apiUrl, options)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    if(response.status=400){
+                        alert("Папка уже существует")
+                    }
+                    throw new Error('Ошибка создания папки');
+                }
+            })
+            .then(data => {
+                // Обработка успешного ответа
+                console.log('Папка успешно создана:', data);
+                closeForm('create_folder_overlay');
+                if(parentAttribute == "null\\") ajaxRequest("");
                 else ajaxRequest(parentAttribute);
             })
             .catch(error => {

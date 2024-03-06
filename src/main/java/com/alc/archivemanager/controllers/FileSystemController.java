@@ -16,4 +16,9 @@ public class FileSystemController {
     public String index(Model model){
         return "fileSystemPage";
     }
+
+    @GetMapping("/uploadForm")
+    public String uploadForm(){
+        return "uploadForm";
+    }
 }
