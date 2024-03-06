@@ -55,7 +55,7 @@
           url: '/api/get_files',
           dataType:'json',
           type:'GET',
-          data: {"main_path":path },
+          data: {"path":path },
           success: function (data) {
             showData(data);
           },
@@ -133,7 +133,6 @@
             formData.append("destination", parentAttribute);
         }
 
-        // Добавляем значение атрибута parent к formData в качестве destination
 
         // Опции запроса
         var options = {

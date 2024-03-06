@@ -1,10 +1,13 @@
 package com.alc.archivemanager.util;
 
 import com.alc.archivemanager.model.FileSystemItem;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class FileUtil {
     public static List<FileSystemItem> getFiles(String mainPath){
@@ -20,5 +23,16 @@ public class FileUtil {
         }
 
         return result;
+    }
+
+    public static void saveFile(MultipartFile file, String destination) throws IOException {
+        File uploadDir = new File(destination);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        String uFileName = UUID.randomUUID() + "." + file.getOriginalFilename();
+        File uploadedFile = new File(destination + uFileName);
+        file.transferTo(uploadedFile);
     }
 }

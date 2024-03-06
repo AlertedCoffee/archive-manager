@@ -16,7 +16,7 @@ public class FileSystemItem {
 
     public FileSystemItem(File file) {
         String path = file.getPath();
-        this.path = path;
+        this.path = path.substring(path.lastIndexOf("\\storage"));
 
         int dotIndex = path.lastIndexOf('.');
         String extension = (dotIndex == -1) ? "" : path.substring(dotIndex);
@@ -27,6 +27,7 @@ public class FileSystemItem {
         };
 
         String parent = file.getParent();
+        parent = parent.substring(parent.lastIndexOf("\\storage"));
         if(!parent.substring(parent.lastIndexOf('\\')).equals("\\storage")) this.parent = parent;
         else this.parent = null;
     }

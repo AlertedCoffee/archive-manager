@@ -13,16 +13,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
 public class RestApiController {
+
+    private final String MAIN_PATH = "C:/WebPractice/archive-manager/src/main/resources/";
+    private final String STORAGE_SUFFIX = "storage/";
 
     @GetMapping("/search")
     public List<SearchResult> search(@RequestParam(name = "method", required = false) String method,
@@ -36,7 +36,7 @@ public class RestApiController {
             default -> new ApacheLuceneSearcher();
         };
 
-        List<SearchResult> searchResult = searcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage/", search_param);
+        List<SearchResult> searchResult = searcher.searchProcess(MAIN_PATH + STORAGE_SUFFIX, search_param);
         searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
 
         return searchResult;
@@ -44,13 +44,14 @@ public class RestApiController {
 
     @GetMapping("/get_files")
     public List<FileSystemItem> getFiles(
-            @RequestParam(name = "main_path", required = false) String mainPath
+            @RequestParam(name = "path", required = false) String path
     ) {
-        List<FileSystemItem> xui = FileUtil.getFiles(mainPath == null || mainPath.isEmpty() ? "C:/WebPractice/archive-manager/src/main/resources/storage/" : mainPath);
-        if(xui.isEmpty()){
-            xui.add(new FileSystemItem(mainPath, FileType.SHADOW, mainPath));
+        if (path.contains("..")) return null;
+        List<FileSystemItem> files = FileUtil.getFiles(path == null || path.isEmpty() ? MAIN_PATH + STORAGE_SUFFIX : MAIN_PATH + path);
+        if(files.isEmpty()){
+            files.add(new FileSystemItem(path, FileType.SHADOW, path));
         }
-        return xui;
+        return files;
     }
 
 
@@ -62,24 +63,18 @@ public class RestApiController {
             return new ResponseEntity<>("Пожалуйста, выберите файл для загрузки.", HttpStatus.BAD_REQUEST);
         }
 
+        if (destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
         // Проверяем, было ли передано место для сохранения файла
         if (destination.isEmpty() || destination.equals("null")) {
-            destination = "C:/WebPractice/archive-manager/src/main/resources/storage/";
+            destination = MAIN_PATH + STORAGE_SUFFIX;
         }
+        else destination  = MAIN_PATH + destination;
 
         try {
-            File uploadDir = new File(destination);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+            FileUtil.saveFile(file, destination);
 
-
-
-            String uFileName = UUID.randomUUID() + "." + file.getOriginalFilename();
-            File uploadedFile = new File(destination + uFileName);
-            file.transferTo(uploadedFile);
-
-            return new ResponseEntity<>("Файл успешно загружен по пути: " + uploadedFile.getAbsolutePath(), HttpStatus.OK);
+            return new ResponseEntity<>("Файл успешно загружен.", HttpStatus.OK);
         } catch (IOException e) {
             return new ResponseEntity<>("Ошибка при загрузке файла: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
