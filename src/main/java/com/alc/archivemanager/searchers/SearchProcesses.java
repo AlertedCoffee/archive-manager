@@ -10,17 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SearchProcesses implements ISearcher{
-    public static final String PDF = ".pdf";
-    public static final String DOCX = ".docx";
-    public static final String ODT = ".odt";
-    public static final String TXT = ".txt";
-    public static final String PARSED = ".parsed";
+    public static final String PDF = "pdf";
+    public static final String DOCX = "docx";
+    public static final String ODT = "odt";
+    public static final String TXT = "txt";
+    public static final String PARSED = "parsed";
 
 
     protected static boolean checkAttributes(File file, File parsed) throws IOException {
         BasicFileAttributes parsedAttributes = Files.readAttributes(parsed.toPath(), BasicFileAttributes.class);
         BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        boolean test = parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
         return parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
     }
 
@@ -31,10 +30,10 @@ public abstract class SearchProcesses implements ISearcher{
 
         if (file.isFile()) {
             int dotIndex = file.getPath().lastIndexOf('.');
-            String extension = (dotIndex == -1) ? "" : file.getPath().substring(dotIndex);
+            String extension = com.google.common.io.Files.getFileExtension(file.getName());
             try {
                 if (!extension.equals(PARSED)) {
-                    File parsed = new File(file.getPath().substring(0, dotIndex) + PARSED);
+                    File parsed = new File(file.getPath().substring(0, dotIndex) + "." + PARSED);
 
                     if (parsed.exists() && checkAttributes(file, parsed)) {
                         content.add(parsed.getPath());
@@ -58,8 +57,7 @@ public abstract class SearchProcesses implements ISearcher{
     }
 
     protected IParser parserFactory(String fileName){
-        int dotIndex = fileName.lastIndexOf('.');
-        String extension = (dotIndex == -1) ? "" : fileName.substring(dotIndex);
+        String extension = com.google.common.io.Files.getFileExtension(fileName);
 
         return switch (extension){
             case PDF -> new ICEPDFHelper();

@@ -1,5 +1,7 @@
 package com.alc.archivemanager.model;
 
+import com.google.common.io.Files;
+
 import java.io.File;
 
 public class FileSystemItem {
@@ -18,11 +20,10 @@ public class FileSystemItem {
         String path = file.getPath();
         this.path = path.substring(path.lastIndexOf("\\storage"));
 
-        int dotIndex = path.lastIndexOf('.');
-        String extension = (dotIndex == -1) ? "" : path.substring(dotIndex);
+        String extension = Files.getFileExtension(file.getName());
         this.fileType = switch (extension){
             case "" -> FileType.DIR;
-            case ".parsed" -> FileType.PARSED;
+            case "parsed" -> FileType.PARSED;
             default -> FileType.FILE;
         };
 

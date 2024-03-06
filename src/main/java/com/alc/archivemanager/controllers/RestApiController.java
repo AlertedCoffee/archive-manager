@@ -43,15 +43,15 @@ public class RestApiController {
     }
 
     @GetMapping("/get_files")
-    public List<FileSystemItem> getFiles(
+    public ResponseEntity<List<FileSystemItem>> getFiles(
             @RequestParam(name = "path", required = false) String path
     ) {
-        if (path.contains("..")) return null;
+        if (path.contains("..")) return new ResponseEntity<>(HttpStatus.LOCKED);
         List<FileSystemItem> files = FileUtil.getFiles(path == null || path.isEmpty() ? MAIN_PATH + STORAGE_SUFFIX : MAIN_PATH + path);
         if(files.isEmpty()){
             files.add(new FileSystemItem(path, FileType.SHADOW, path));
         }
-        return files;
+        return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
 
