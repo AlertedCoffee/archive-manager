@@ -39,10 +39,20 @@ tbody tr:hover {
 }
 
 .nav-btn{
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
     border: none;
     background-size: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.nav-btn:hover{
+    background-color: #cccccc;
+}
+
+.nav-btn:active{
+    width: 36px;
+    height: 36px;
 }
 
 .upload-ico{

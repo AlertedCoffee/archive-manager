@@ -23,7 +23,7 @@
     <div id="upload-form" class="form">
         <span id="close-btn" class="close-btn" onclick="closeForm('upload_overlay')">&times;</span>
         <h2>Загрузка файла</h2>
-        <form id="uploadFileForm" class="form" action="/api/upload" method="post" enctype="multipart/form-data">
+        <form id="uploadFileForm" class="form" enctype="multipart/form-data">
             <input type="file" name="file" id="fileInput" required>
             <br>
             <input type="button" value="Загрузить" onclick="uploadFile()">
@@ -35,7 +35,7 @@
     <div id="create-folder-form" class="form">
         <span id="close-btn" class="close-btn" onclick="closeForm('create_folder_overlay')">&times;</span>
         <h2>Создать папку</h2>
-        <form id="createFolderForm" class="form" action="/api/create_folder" method="post">
+        <form id="createFolderForm" class="form">
             <input type="text" name="folder_name" value="Новая папка" id="folderName" required>
             <br>
             <input type="button" value="Создать" onclick="addFolder()">
@@ -78,6 +78,13 @@
     function start() {
         ajaxRequest(null);
     }
+
+    // $(document).ready(function() {
+    $('#create-folder-form').submit(function(event) {
+        event.preventDefault();
+        addFolder();
+    });
+    // });
 
     function ajaxRequest(path){
         $.ajax({
@@ -244,14 +251,14 @@
         var formData = new FormData(form);
 
         // Получаем значение атрибута parent у tbody
-        var parentAttribute = document.getElementById("tbody").getAttribute("parent") + '\\';
+        var parentAttribute = document.getElementById("tbody").getAttribute("parent");
 
         // Проверяем, было ли передано место для сохранения файла
-        if (parentAttribute == "null\\") {
+        if (parentAttribute == "null") {
             formData.append("destination", null);  
         }
         else{
-            formData.append("destination", parentAttribute);
+            formData.append("destination", parentAttribute + '\\');
         }
 
 
@@ -275,9 +282,9 @@
             })
             .then(data => {
                 // Обработка успешного ответа
-                console.log('Файл успешно загружен:', data);
+                console.log(data);
                 closeForm('upload_overlay');
-                if(parentAttribute == "null\\") ajaxRequest("");
+                if(parentAttribute == "null") ajaxRequest("");
                 else ajaxRequest(parentAttribute);
             })
             .catch(error => {
@@ -292,10 +299,10 @@
         var formData = new FormData(form);
 
         // Получаем значение атрибута parent у tbody
-        var parentAttribute = document.getElementById("tbody").getAttribute("parent") + '\\';
+        var parentAttribute = document.getElementById("tbody").getAttribute("parent");
 
         // Проверяем, было ли передано место для сохранения файла
-        if (parentAttribute == "null\\") {
+        if (parentAttribute == "null") {
             formData.append("destination", null);  
         }
         else{
@@ -326,9 +333,9 @@
             })
             .then(data => {
                 // Обработка успешного ответа
-                console.log('Папка успешно создана:', data);
+                console.log(data);
                 closeForm('create_folder_overlay');
-                if(parentAttribute == "null\\") ajaxRequest("");
+                if(parentAttribute == "null") ajaxRequest("");
                 else ajaxRequest(parentAttribute);
             })
             .catch(error => {

@@ -72,6 +72,8 @@ public class RestApiController {
         }
         else destination  = MAIN_PATH + destination;
 
+        if (!destination.contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
         try {
             FileUtil.saveFile(file, destination);
 
@@ -92,6 +94,8 @@ public class RestApiController {
         }
         else fullPath  = MAIN_PATH + destination;
         fullPath += "/" + folderName;
+
+        if (!destination.contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         try {
             File folder = new File(fullPath);
@@ -118,6 +122,9 @@ public class RestApiController {
         for (String item : items) {
             if (item.contains("..")) return new ResponseEntity<> ("Отказано в доступе.", HttpStatus.LOCKED);
             File file = new File(MAIN_PATH + item);
+
+            if (!file.getPath().contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
             if(file.exists()){
                 if(!deleteDirectory(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
             }
