@@ -35,4 +35,24 @@ public class FileUtil {
         File uploadedFile = new File(destination + uFileName);
         file.transferTo(uploadedFile);
     }
+
+    public static boolean deleteFile(File directory) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // Рекурсивное удаление поддиректорий
+                        deleteFile(file);
+                    } else {
+                        // Удаление файла
+                        file.delete();
+                    }
+                }
+            }
+            // Удаление самой директории
+            return directory.delete();
+        }
+        return false;
+    }
 }

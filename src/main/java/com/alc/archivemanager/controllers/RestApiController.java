@@ -64,15 +64,13 @@ public class RestApiController {
             return new ResponseEntity<>("Пожалуйста, выберите файл для загрузки.", HttpStatus.BAD_REQUEST);
         }
 
-        if (destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
-
         // Проверяем, было ли передано место для сохранения файла
         if (destination.isEmpty() || destination.equals("null")) {
             destination = MAIN_PATH + STORAGE_SUFFIX;
         }
         else destination  = MAIN_PATH + destination;
 
-        if (!destination.contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+        if (!destination.contains("storage") || destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         try {
             FileUtil.saveFile(file, destination);
@@ -87,7 +85,6 @@ public class RestApiController {
     public ResponseEntity<String> createFolder(@RequestParam("folder_name") String folderName,
                                                @RequestParam("destination") String destination) {
         String fullPath;
-        if (destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         if (destination.isEmpty() || destination.equals("null")) {
             fullPath = MAIN_PATH + STORAGE_SUFFIX;
@@ -95,7 +92,7 @@ public class RestApiController {
         else fullPath  = MAIN_PATH + destination;
         fullPath += "/" + folderName;
 
-        if (!destination.contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+        if (!fullPath.contains("storage") || destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         try {
             File folder = new File(fullPath);
@@ -120,36 +117,40 @@ public class RestApiController {
     public ResponseEntity<String> deleteItems(@RequestBody String[] items){
         StringBuilder result = new StringBuilder();
         for (String item : items) {
-            if (item.contains("..")) return new ResponseEntity<> ("Отказано в доступе.", HttpStatus.LOCKED);
             File file = new File(MAIN_PATH + item);
 
-            if (!file.getPath().contains("storage")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+            if (!file.getPath().contains("storage") || item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
             if(file.exists()){
-                if(!deleteDirectory(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
+                if(!FileUtil.deleteFile(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
             }
         }
         return new ResponseEntity<>("Удалено.", HttpStatus.OK);
     }
 
-    private static boolean deleteDirectory(File directory) {
-        if (directory.exists()) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        // Рекурсивное удаление поддиректорий
-                        deleteDirectory(file);
-                    } else {
-                        // Удаление файла
-                        file.delete();
-                    }
-                }
+    @PutMapping("/rename")
+    public ResponseEntity<String> renameFile(
+            @RequestParam("destination") String filePath,
+            @RequestParam("new_name") String newName) {
+        try {
+            // Путь к файлу
+            String fileFullPath = MAIN_PATH + filePath;
+
+            if (!fileFullPath.contains("storage") || fileFullPath.contains("..") || newName.contains("..") || newName.contains("\\") || newName.contains("/")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
+            // Переименование файла
+            File file = new File(fileFullPath);
+            String parentPath = file.getParent();
+            File newFile = new File(parentPath, newName);
+
+            if (file.renameTo(newFile)) {
+                return ResponseEntity.ok("Файл успешно переименован.");
+            } else {
+                return ResponseEntity.badRequest().body("Не удалось переименовать файл.");
             }
-            // Удаление самой директории
-            return directory.delete();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
         }
-        return false;
     }
 
 }

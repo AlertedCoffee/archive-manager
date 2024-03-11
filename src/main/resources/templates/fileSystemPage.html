@@ -16,12 +16,13 @@
         <button class="nav-btn create-folder-ico" id="create-folder-btn" onclick="showForm('create_folder_overlay')"></button>
         <button class="nav-btn delete-ico disp-none" id="delete-btn" onclick="showForm('delete_overlay')" ></button>
         <button class="nav-btn cross-ico disp-none" id="remove-select-btn" onclick="removeSelection()" ></button>
+        <button class="nav-btn edit-ico disp-none" id="rename-btn" onclick="preRename()" ></button>
     </div>
 </header>
 
 <div id="upload_overlay" class="overlay">
     <div id="upload-form" class="form">
-        <span id="close-btn" class="close-btn" onclick="closeForm('upload_overlay')">&times;</span>
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
         <h2>Загрузка файла</h2>
         <form id="uploadFileForm" class="form" enctype="multipart/form-data">
             <input type="file" name="file" id="fileInput" required>
@@ -33,7 +34,7 @@
 
 <div id="create_folder_overlay" class="overlay">
     <div id="create-folder-form" class="form">
-        <span id="close-btn" class="close-btn" onclick="closeForm('create_folder_overlay')">&times;</span>
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
         <h2>Создать папку</h2>
         <form id="createFolderForm" class="form">
             <input type="text" name="folder_name" value="Новая папка" id="folderName" required>
@@ -43,12 +44,24 @@
     </div>
 </div>
 
+<div id="rename_overlay" class="overlay">
+    <div id="rename" class="form wide-block">
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
+        <h2>Переименовать</h2>
+        <form id="rename-form" class="form">
+            <input type="text" name="new_name" value="" class="wide-block" id="new_name" required>
+            <br>
+            <input type="button" value="Ок" onclick="rename()">
+        </form>
+    </div>
+</div>
+
 <div id="delete_overlay" class="overlay">
     <div id="delete-form" class="form">
-        <span id="close-btn" class="close-btn" onclick="closeForm('delete_overlay')">&times;</span>
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
         <h2>Удалить элементы: <span id="delete-count"></span>?</h2>
         <div class="button-container">
-            <input type="button" value="Нет" onclick="closeForm('delete_overlay')">
+            <input type="button" value="Нет" onclick="closeForm(this.parentElement.parentElement.parentElement.id)">
             <input type="button" value="Да" onclick="deleteItems()">
         </div>
     </div>
@@ -80,10 +93,15 @@
     }
 
     // $(document).ready(function() {
-    $('#create-folder-form').submit(function(event) {
-        event.preventDefault();
-        addFolder();
-    });
+        $('#create-folder-form').submit(function(event) {
+            event.preventDefault();
+            addFolder();
+        });
+
+        $('#rename-form').submit(function(event) {
+            event.preventDefault();
+            rename();
+        });
     // });
 
     function ajaxRequest(path){
@@ -184,6 +202,10 @@
                     if(selectedRows.length == 0){
                         hideButton("delete-btn");
                         hideButton("remove-select-btn");
+                        hideButton("rename-btn");
+                    }
+                    if(selectedRows.length == 1){
+                        showButton("rename-btn");
                     }
                 } else {
                     row.classList.add("selected-item");
@@ -192,6 +214,13 @@
 
                     // Добавляем элемент в массив выделенных
                     selectedRows.push(row);
+
+                    if(selectedRows.length == 1){
+                        showButton("rename-btn");
+                    }
+                    else{
+                        hideButton("rename-btn");
+                    }
                 }
         }
     }
@@ -205,6 +234,7 @@
         selectedRows = [];
         hideButton("delete-btn");
         hideButton("remove-select-btn");
+        hideButton("rename-btn");
     }
 
     function deleteItems(){
@@ -325,7 +355,7 @@
                 if (response.ok) {
                     return response.text();
                 } else {
-                    if(response.status=400){
+                    if(response.status==400){
                         alert("Папка уже существует")
                     }
                     throw new Error('Ошибка создания папки');
@@ -343,4 +373,59 @@
                 console.error('Произошла ошибка:', error.message);
             });
     }
+
+    function preRename(){
+        document.getElementById('new_name').value = selectedRows[0].cells[1].innerText;
+        showForm('rename_overlay');
+    }
+
+    function rename(){
+        // Получаем форму и ее данные
+        var form = document.getElementById("rename-form");
+        var formData = new FormData(form);
+
+        formData.append("destination", selectedRows[0].getAttribute("path"));
+        
+        var parentAttribute = document.getElementById("tbody").getAttribute("parent");
+
+        // Опции запроса
+        var options = {
+            method: 'PUT',
+            body: formData
+        };
+
+        // Замените URL на ваш API endpoint
+        var apiUrl = '/api/rename';
+
+        let name = formData.get("new_name");
+        let dest = formData.get("destination");
+
+        // Отправляем запрос с использованием Fetch API
+        fetch(apiUrl, options)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    if(response.status==400){
+                        alert("Недопустимое имя")
+                    }
+                    if(response.status==423){
+                        alert("Отказано в доступе")
+                    }
+                    throw new Error('Ошибка переименования.');
+                }
+            })
+            .then(data => {
+                // Обработка успешного ответа
+                console.log(data);
+                closeForm('rename_overlay');
+                if(parentAttribute == "null") ajaxRequest("");
+                else ajaxRequest(parentAttribute);
+            })
+            .catch(error => {
+                // Обработка ошибок
+                console.error('Произошла ошибка:', error.message);
+            });
+    }
+
 </script>
