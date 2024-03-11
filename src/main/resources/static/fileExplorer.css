@@ -30,6 +30,10 @@ tbody tr:hover {
     background-color:bisque;
 }
 
+.selected-item {
+    background-color:bisque;
+}
+
 .fs-item {
     cursor: pointer;
 }
@@ -47,4 +51,16 @@ tbody tr:hover {
 
 .create-folder-ico{
     background-image: url('/icons/create-folder.png');
+}
+
+.delete-ico{
+    background-image: url('/icons/delete.png');
+}
+
+.cross-ico{
+    background-image: url('/icons/cross.png');
+}
+
+.disp-none{
+    display: none;
 }

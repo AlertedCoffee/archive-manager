@@ -11,15 +11,19 @@
 </head>
 <body onload="start()">
 <header class="header">
-    <div><button class="nav-btn upload-ico" onclick="showForm('upload_overlay')"></button>
-        <button class="nav-btn create-folder-ico" onclick="showForm('create_folder_overlay')"></button></div>
+    <div>
+        <button class="nav-btn upload-ico" id="upload-btn" onclick="showForm('upload_overlay')"></button>
+        <button class="nav-btn create-folder-ico" id="create-folder-btn" onclick="showForm('create_folder_overlay')"></button>
+        <button class="nav-btn delete-ico disp-none" id="delete-btn" onclick="showForm('delete_overlay')" ></button>
+        <button class="nav-btn cross-ico disp-none" id="remove-select-btn" onclick="removeSelection()" ></button>
+    </div>
 </header>
 
 <div id="upload_overlay" class="overlay">
     <div id="upload-form" class="form">
         <span id="close-btn" class="close-btn" onclick="closeForm('upload_overlay')">&times;</span>
         <h2>Загрузка файла</h2>
-        <form id="uploadFileForm" action="/api/upload" method="post" enctype="multipart/form-data">
+        <form id="uploadFileForm" class="form" action="/api/upload" method="post" enctype="multipart/form-data">
             <input type="file" name="file" id="fileInput" required>
             <br>
             <input type="button" value="Загрузить" onclick="uploadFile()">
@@ -31,11 +35,22 @@
     <div id="create-folder-form" class="form">
         <span id="close-btn" class="close-btn" onclick="closeForm('create_folder_overlay')">&times;</span>
         <h2>Создать папку</h2>
-        <form id="createFolderForm" action="/api/create_folder" method="post" enctype="multipart/form-data">
+        <form id="createFolderForm" class="form" action="/api/create_folder" method="post">
             <input type="text" name="folder_name" value="Новая папка" id="folderName" required>
             <br>
             <input type="button" value="Создать" onclick="addFolder()">
         </form>
+    </div>
+</div>
+
+<div id="delete_overlay" class="overlay">
+    <div id="delete-form" class="form">
+        <span id="close-btn" class="close-btn" onclick="closeForm('delete_overlay')">&times;</span>
+        <h2>Удалить элементы: <span id="delete-count"></span>?</h2>
+        <div class="button-container">
+            <input type="button" value="Нет" onclick="closeForm('delete_overlay')">
+            <input type="button" value="Да" onclick="deleteItems()">
+        </div>
     </div>
 </div>
 
@@ -59,6 +74,7 @@
 </html>
 
 <script>
+    let selectedRows = [];
     function start() {
         ajaxRequest(null);
     }
@@ -79,13 +95,16 @@
     }
 
     function showData(data) {
+        removeSelection();
         const tbody = document.getElementById("tbody");
         $('tbody').empty();
 
         if(data.length != 0){
             if(data[0].parent != null){
                 let newPath = data[0].parent.substring(0, data[0].parent.lastIndexOf('\\'));
-                tbody.append(addRow('..', "DIR", newPath, ""));
+                let row = addRow('..', "DIR", newPath, "");
+                row.setAttribute('boynextdoor', '1');
+                tbody.append(row);
             }
             tbody.setAttribute("parent", data[0].parent) + '\\';
         }
@@ -110,6 +129,8 @@
                     row.setAttribute("ondblclick", "openDir(this)");
                 }
 
+                row.setAttribute("onclick", "rowClick(event)");
+
                 row.append(extension);
                 row.append(fileName);
         
@@ -122,11 +143,99 @@
 
     function showForm(name) {
         document.getElementById(name).style.display = 'flex';
+        if(name == "delete_overlay"){
+            document.getElementById("delete-count").innerText = selectedRows.length;
+        }
+    }
+
+    function showButton(name) {
+        document.getElementById(name).style.display = "inline";
+    }
+
+    function hideButton(name) {
+        document.getElementById(name).style.display = "none";
     }
 
 
     function closeForm(name) {
         document.getElementById(name).style.display = 'none';
+    }
+
+    function rowClick(event){
+        let target = event.target;
+        if (target.tagName === "TD") {
+                var row = target.parentElement;
+                if(row.getAttribute('boynextdoor')) return;
+                // Переключаем состояние выделения строки
+                if (row.classList.contains("selected-item")) {
+                    row.classList.remove("selected-item");
+                    // Удаляем элемент из массива выделенных, если он был выделен
+                    var index = selectedRows.indexOf(row);
+                    if (index !== -1) {
+                        selectedRows.splice(index, 1);
+                    }
+                    if(selectedRows.length == 0){
+                        hideButton("delete-btn");
+                        hideButton("remove-select-btn");
+                    }
+                } else {
+                    row.classList.add("selected-item");
+                    showButton("delete-btn");
+                    showButton("remove-select-btn");
+
+                    // Добавляем элемент в массив выделенных
+                    selectedRows.push(row);
+                }
+        }
+    }
+
+    function removeSelection(){
+        selectedRows.forEach(element => {
+            if (element.classList.contains("selected-item")) {
+                element.classList.remove("selected-item");
+            }
+        });
+        selectedRows = [];
+        hideButton("delete-btn");
+        hideButton("remove-select-btn");
+    }
+
+    function deleteItems(){
+        closeForm("delete_overlay");
+        
+        let files = [];
+        selectedRows.forEach(element => {
+            files.push(element.getAttribute("path"));
+        })
+
+
+        var options = {
+            method: 'DELETE',
+            headers: {
+                    'Content-Type': 'application/json',
+                },
+            body: JSON.stringify(files)
+        };
+
+        fetch('/api/delete_items', options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при отправке данных на сервер');
+                }
+                let parent = document.getElementById("tbody").getAttribute("parent");
+                if(parent == "null") ajaxRequest("");
+                else ajaxRequest(parent);
+                return response.text();
+            })
+            .then(responseText => {
+                console.log(responseText);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        removeSelection();
+        
     }
 
     function uploadFile() {

@@ -94,7 +94,6 @@ public class RestApiController {
         fullPath += "/" + folderName;
 
         try {
-            // Создание папки
             File folder = new File(fullPath);
             if (!folder.exists()) {
                 if (folder.mkdirs()) {
@@ -112,4 +111,38 @@ public class RestApiController {
                     .body("Произошла ошибка при создании папки. " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/delete_items")
+    public ResponseEntity<String> deleteItems(@RequestBody String[] items){
+        StringBuilder result = new StringBuilder();
+        for (String item : items) {
+            if (item.contains("..")) return new ResponseEntity<> ("Отказано в доступе.", HttpStatus.LOCKED);
+            File file = new File(MAIN_PATH + item);
+            if(file.exists()){
+                if(!deleteDirectory(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        return new ResponseEntity<>("Удалено.", HttpStatus.OK);
+    }
+
+    private static boolean deleteDirectory(File directory) {
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // Рекурсивное удаление поддиректорий
+                        deleteDirectory(file);
+                    } else {
+                        // Удаление файла
+                        file.delete();
+                    }
+                }
+            }
+            // Удаление самой директории
+            return directory.delete();
+        }
+        return false;
+    }
+
 }
