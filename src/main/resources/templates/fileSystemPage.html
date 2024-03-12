@@ -16,7 +16,7 @@
         <button class="nav-btn create-folder-ico" id="create-folder-btn" onclick="showForm('create_folder_overlay')"></button>
         <button class="nav-btn delete-ico disp-none" id="delete-btn" onclick="showForm('delete_overlay')" ></button>
         <button class="nav-btn cross-ico disp-none" id="remove-select-btn" onclick="removeSelection()" ></button>
-        <button class="nav-btn edit-ico disp-none" id="rename-btn" onclick="preRename()" ></button>
+        <button class="nav-btn edit-ico disp-none" id="rename-btn" onclick="showForm('rename_overlay')" ></button>
     </div>
 </header>
 
@@ -92,17 +92,15 @@
         ajaxRequest(null);
     }
 
-    // $(document).ready(function() {
-        $('#create-folder-form').submit(function(event) {
-            event.preventDefault();
-            addFolder();
-        });
+    $('#create-folder-form').submit(function(event) {
+        event.preventDefault();
+        addFolder();
+    });
 
-        $('#rename-form').submit(function(event) {
-            event.preventDefault();
-            rename();
-        });
-    // });
+    $('#rename-form').submit(function(event) {
+        event.preventDefault();
+        rename();
+    });
 
     function ajaxRequest(path){
         $.ajax({
@@ -154,6 +152,10 @@
                     row.setAttribute("ondblclick", "openDir(this)");
                 }
 
+                if(fileType == "FILE"){
+                    row.setAttribute("ondblclick", "downloadFile(\"" + path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + "\")");
+                }
+
                 row.setAttribute("onclick", "rowClick(event)");
 
                 row.append(extension);
@@ -170,6 +172,9 @@
         document.getElementById(name).style.display = 'flex';
         if(name == "delete_overlay"){
             document.getElementById("delete-count").innerText = selectedRows.length;
+        }
+        if(name == "rename_overlay"){
+            document.getElementById('new_name').value = selectedRows[0].cells[1].innerText;
         }
     }
 
@@ -374,11 +379,6 @@
             });
     }
 
-    function preRename(){
-        document.getElementById('new_name').value = selectedRows[0].cells[1].innerText;
-        showForm('rename_overlay');
-    }
-
     function rename(){
         // Получаем форму и ее данные
         var form = document.getElementById("rename-form");
@@ -426,6 +426,36 @@
                 // Обработка ошибок
                 console.error('Произошла ошибка:', error.message);
             });
+    }
+
+
+    async function downloadFile(filePath){
+      
+        try {
+
+            const params = new URLSearchParams();
+            params.append('path', filePath);
+
+            const response = await fetch(`/api/download_file?${params.toString()}`);
+            
+            if (response.ok) {
+                
+                const fileName = filePath.substring(filePath.lastIndexOf('\\') + 1);
+
+                const blob = await response.blob();
+
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = fileName;
+                link.click();
+
+                console.log('Файл скачен: ', fileName);
+            } else {
+                console.error('Не удалось загрузить файл:', response.statusText);
+            }
+        } catch (error) {
+            console.error('При загрузке файла произошла ошибка:', error);
+        }
     }
 
 </script>

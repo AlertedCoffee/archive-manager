@@ -8,13 +8,21 @@ import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import com.alc.archivemanager.util.FileUtil;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 
@@ -150,6 +158,25 @@ public class RestApiController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/download_file")
+    public ResponseEntity<Resource> downloadFile(@RequestParam("path") String filePath) throws IOException {
+        // Здесь необходимо указать путь к папке, в которой хранятся ваши файлы
+        Path file = Path.of(MAIN_PATH, filePath);
+
+        if (!file.toString().contains("storage") || file.toString().contains("..")) return new ResponseEntity<>(null, HttpStatus.LOCKED);
+
+        Resource resource = new UrlResource(file.toUri());
+
+        if (resource.exists() && resource.isReadable()) {
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
