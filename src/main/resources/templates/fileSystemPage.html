@@ -125,9 +125,11 @@
         if(data.length != 0){
             if(data[0].parent != null){
                 let newPath = data[0].parent.substring(0, data[0].parent.lastIndexOf('\\'));
-                let row = addRow('..', "DIR", newPath, "");
-                row.setAttribute('boynextdoor', '1');
-                tbody.append(row);
+                if (newPath != "") {                
+                    let row = addRow('..', "DIR", newPath, "");
+                    row.setAttribute('boynextdoor', '1');
+                    tbody.append(row);
+                }
             }
             tbody.setAttribute("parent", data[0].parent) + '\\';
         }

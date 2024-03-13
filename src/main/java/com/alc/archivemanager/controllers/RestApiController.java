@@ -34,21 +34,26 @@ public class RestApiController {
     private final String STORAGE_SUFFIX = "storage/";
 
     @GetMapping("/search")
-    public List<SearchResult> search(@RequestParam(name = "method", required = false) String method,
+    public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "method", required = false) String method,
                                      @RequestParam("search_param") String search_param) throws Exception {
 
-        if(search_param == null || search_param.isEmpty()) throw new Exception("Параметр поиска не задан");
+        try {
+            if (search_param == null || search_param.isEmpty()) throw new Exception("Параметр поиска не задан");
 
-        ISearcher searcher = switch (method) {
-            case "neural" -> new DeepPavlovSearcher();
-            case "combo" -> new ComboSearcher();
-            default -> new ApacheLuceneSearcher();
-        };
+            ISearcher searcher = switch (method) {
+                case "neural" -> new DeepPavlovSearcher();
+                case "combo" -> new ComboSearcher();
+                default -> new ApacheLuceneSearcher();
+            };
 
-        List<SearchResult> searchResult = searcher.searchProcess(MAIN_PATH + STORAGE_SUFFIX, search_param);
-        searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
-
-        return searchResult;
+            List<SearchResult> searchResult = searcher.searchProcess(MAIN_PATH + STORAGE_SUFFIX, search_param);
+            searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
+            return new ResponseEntity<>(searchResult, HttpStatus.OK);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/get_files")
