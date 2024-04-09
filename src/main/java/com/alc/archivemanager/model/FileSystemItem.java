@@ -7,7 +7,6 @@ import java.io.File;
 public class FileSystemItem {
     private final String path;
     private final FileType fileType;
-
     private final String parent;
 
     public FileSystemItem(String path, FileType fileType, String parent) {

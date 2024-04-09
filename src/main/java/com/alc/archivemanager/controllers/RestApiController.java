@@ -8,6 +8,7 @@ import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import com.alc.archivemanager.util.FileUtil;
+import com.google.common.io.Files;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -151,10 +152,14 @@ public class RestApiController {
 
             if (!fileFullPath.contains("storage") || fileFullPath.contains("..") || newName.contains("..") || newName.contains("\\") || newName.contains("/")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
+            String collisionPrefix = FileUtil.getCollisionFilePrefix(fileFullPath);
+
             // Переименование файла
             File file = new File(fileFullPath);
             String parentPath = file.getParent();
-            File newFile = new File(parentPath, newName);
+            File newFile = new File(parentPath, collisionPrefix + newName);
+
+            FileUtil.getParsed(file).delete();
 
             if (file.renameTo(newFile)) {
                 return ResponseEntity.ok("Файл успешно переименован.");

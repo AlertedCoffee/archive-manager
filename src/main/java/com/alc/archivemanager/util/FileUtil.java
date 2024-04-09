@@ -69,4 +69,20 @@ public class FileUtil {
     public static File getParsed(File file){
         return new File(file.getParent() + '\\' + Files.getNameWithoutExtension(file.getPath()) + '.' + SearchProcesses.PARSED);
     }
+
+    public static String getCollisionFilePrefix(String fileName){
+
+        String[] nameParts = Files.getNameWithoutExtension(fileName).split("\\.");
+
+        while (true) {
+            if (nameParts.length >= 2) {
+
+                if (nameParts[0].length() != 36) break;
+
+                return nameParts[0] + '.';
+            }
+            break;
+        }
+        return "";
+    }
 }
