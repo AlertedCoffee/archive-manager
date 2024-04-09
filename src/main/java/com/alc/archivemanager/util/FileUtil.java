@@ -1,6 +1,7 @@
 package com.alc.archivemanager.util;
 
 import com.alc.archivemanager.model.FileSystemItem;
+import com.alc.archivemanager.searchers.SearchProcesses;
 import com.google.common.io.Files;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,10 +59,14 @@ public class FileUtil {
 
     private static boolean delete(File file){
         // Удаление сопутствующего parsed
-        File parsed = new File(file.getParent() + '\\' + Files.getNameWithoutExtension(file.getPath()) + ".parsed");
+        File parsed = getParsed(file);
         if(parsed.exists()) parsed.delete();
 
         // Удаление файла
         return file.delete();
+    }
+
+    public static File getParsed(File file){
+        return new File(file.getParent() + '\\' + Files.getNameWithoutExtension(file.getPath()) + '.' + SearchProcesses.PARSED);
     }
 }

@@ -1,6 +1,7 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.parsers.*;
+import com.alc.archivemanager.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public abstract class SearchProcesses implements ISearcher{
             String extension = com.google.common.io.Files.getFileExtension(file.getName());
             try {
                 if (!extension.equals(PARSED)) {
-                    File parsed = new File(file.getPath().substring(0, dotIndex) + "." + PARSED);
+                    File parsed = FileUtil.getParsed(file);
 
                     if (parsed.exists() && checkAttributes(file, parsed)) {
                         content.add(parsed.getPath());
