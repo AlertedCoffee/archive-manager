@@ -1,6 +1,7 @@
 package com.alc.archivemanager.util;
 
 import com.alc.archivemanager.model.FileSystemItem;
+import com.google.common.io.Files;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -45,14 +46,22 @@ public class FileUtil {
                         // Рекурсивное удаление поддиректорий
                         deleteFile(file);
                     } else {
-                        // Удаление файла
-                        file.delete();
+                        delete(file);
                     }
                 }
             }
-            // Удаление самой директории
-            return directory.delete();
+            return delete(directory);
+
         }
         return false;
+    }
+
+    private static boolean delete(File file){
+        // Удаление сопутствующего parsed
+        File parsed = new File(file.getParent() + '\\' + Files.getNameWithoutExtension(file.getPath()) + ".parsed");
+        if(parsed.exists()) parsed.delete();
+
+        // Удаление файла
+        return file.delete();
     }
 }

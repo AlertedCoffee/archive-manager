@@ -34,6 +34,23 @@ public class FileSystemItem {
     }
 
     public String getName() {
+        String[] pathParts = path.split("\\.");
+
+        while (true) {
+            if (pathParts.length >= 3) {
+
+                if (pathParts[0].length() != 45) break;
+
+                StringBuilder builder = new StringBuilder();
+                for (int i = 1; i < pathParts.length; i++) {
+                    builder.append(pathParts[i]);
+                    if (i < pathParts.length - 1) builder.append('.');
+                }
+
+                return builder.toString();
+            }
+            break;
+        }
         return path.substring(path.lastIndexOf("\\") + 1);
     }
 

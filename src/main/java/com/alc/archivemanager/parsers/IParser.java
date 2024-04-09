@@ -9,7 +9,7 @@ public interface IParser {
     public String parse(String filePath) throws Exception;
     public static void saveParsed(String text, String filePath) throws Exception{
         int dotIndex = filePath.lastIndexOf('.');
-        filePath = filePath.substring(0, dotIndex) + SearchProcesses.PARSED;
+        filePath = filePath.substring(0, dotIndex + 1) + SearchProcesses.PARSED;
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(text);
