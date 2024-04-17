@@ -8,8 +8,6 @@ import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import com.alc.archivemanager.util.FileUtil;
-import com.google.common.io.Files;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -20,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -136,7 +132,7 @@ public class RestApiController {
             if (!file.getPath().contains("storage") || item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
             if(file.exists()){
-                if(!FileUtil.deleteFile(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
+                if(!FileUtil.moveToTrashFile(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
             }
         }
         return new ResponseEntity<>("Удалено.", HttpStatus.OK);
