@@ -95,7 +95,16 @@ public class FileUtil {
         try {
             // Восстановление файла
             String previousLocation = java.nio.file.Files.readString(metadataFile.toPath());
-            java.nio.file.Files.move(file.toPath(), new File(previousLocation).toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            File targetFile = new File(previousLocation);
+            Files.createParentDirs(targetFile);
+
+            try {
+                java.nio.file.Files.move(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+            catch (java.nio.file.DirectoryNotEmptyException e){
+                targetFile.delete();
+            }
             // Удаление метаданных
             metadataFile.delete();
         } catch (IOException e) {
