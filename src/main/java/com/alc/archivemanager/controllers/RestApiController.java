@@ -29,6 +29,7 @@ public class RestApiController {
 
     private final String MAIN_PATH = "C:/WebPractice/archive-manager/src/main/resources/";
     private final String STORAGE_SUFFIX = "storage/";
+    private final String TRASH_SUFFIX = "trashFolder/";
 
     @GetMapping("/search")
     public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "method", required = false) String method,
@@ -57,7 +58,7 @@ public class RestApiController {
     public ResponseEntity<List<FileSystemItem>> getFiles(
             @RequestParam(name = "path", required = false) String path
     ) {
-        if (path.contains("..")) return new ResponseEntity<>(HttpStatus.LOCKED);
+        if (path != null) if (path.contains("..")) return new ResponseEntity<>(HttpStatus.LOCKED);
         List<FileSystemItem> files = FileUtil.getFiles(path == null || path.isEmpty() ? MAIN_PATH + STORAGE_SUFFIX : MAIN_PATH + path);
         if(files.isEmpty()){
             files.add(new FileSystemItem(path, FileType.SHADOW, path));
@@ -125,7 +126,8 @@ public class RestApiController {
 
     @DeleteMapping("/delete_items")
     public ResponseEntity<String> deleteItems(@RequestBody String[] items){
-        StringBuilder result = new StringBuilder();
+
+
         for (String item : items) {
             File file = new File(MAIN_PATH + item);
 
@@ -137,6 +139,23 @@ public class RestApiController {
         }
         return new ResponseEntity<>("Удалено.", HttpStatus.OK);
     }
+
+
+    @PutMapping("/recover_items")
+    public ResponseEntity<String> recoverItems(@RequestBody String[] items){
+
+        for (String item : items) {
+            File file = new File(MAIN_PATH + TRASH_SUFFIX + item);
+
+            if (item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
+            if(file.exists()){
+                if(!FileUtil.recoverFile(file)) return new ResponseEntity<>("Ошибка восстановления.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        return new ResponseEntity<>("Восстановлено.", HttpStatus.OK);
+    }
+
 
     @PutMapping("/rename")
     public ResponseEntity<String> renameFile(

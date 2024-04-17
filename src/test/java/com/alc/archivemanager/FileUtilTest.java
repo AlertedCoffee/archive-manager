@@ -12,7 +12,7 @@ import java.io.IOException;
 @SpringBootTest
 public class FileUtilTest {
 
-    private final String TRASH_FOLDER = "C:/WebPractice/archive-manager/src/main/resources/TrashFolder";
+    private final String TRASH_FOLDER = "C:/WebPractice/archive-manager/src/main/resources/trashFolder";
     private final String MAIN_PATH = "C:/WebPractice/archive-manager/src/main/resources/storage";
 
     @Test

@@ -14,7 +14,8 @@ import java.util.UUID;
 
 public class FileUtil {
 
-    private static final String TRASH_FOLDER = "C:/WebPractice/archive-manager/src/main/resources/TrashFolder";
+    private static final String TRASH_FOLDER = "C:/WebPractice/archive-manager/src/main/resources/trashFolder";
+
     public static List<FileSystemItem> getFiles(String mainPath){
         File dir = new File(mainPath);
         File[] files = dir.listFiles();

@@ -34,4 +34,4 @@ build/
 
 src/main/resources/storage/*
 src/main/resources/index/*
-/src/main/resources/TrashFolder/*
+/src/main/resources/trashFolder/*
