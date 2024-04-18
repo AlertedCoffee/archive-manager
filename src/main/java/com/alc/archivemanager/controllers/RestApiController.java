@@ -124,8 +124,8 @@ public class RestApiController {
         }
     }
 
-    @DeleteMapping("/delete_items")
-    public ResponseEntity<String> deleteItems(@RequestBody String[] items){
+    @DeleteMapping("/moveToTrash_items")
+    public ResponseEntity<String> moveToTrashItems(@RequestBody String[] items){
 
 
         for (String item : items) {

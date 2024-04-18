@@ -2,12 +2,13 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>FileSystem</title>
     <link th:href="@{/fileExplorer.css}" rel="stylesheet" />
     <link th:href="@{/addFile.css}" rel="stylesheet" />
     <!-- <link href="../static/fileExplorer.css" rel="stylesheet" /> -->
     <!-- <link href="../static/addFile.css" rel="stylesheet" /> -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script th:src="@{/scripts/getFiles.js}"></script>
 </head>
 <body onload="start()">
 <header class="header">
@@ -89,7 +90,7 @@
 <script>
     let selectedRows = [];
     function start() {
-        ajaxRequest(null);
+        getFiles(null);
     }
 
     $('#create-folder-form').submit(function(event) {
@@ -101,21 +102,6 @@
         event.preventDefault();
         rename();
     });
-
-    function ajaxRequest(path){
-        $.ajax({
-          url: '/api/get_files',
-          dataType:'json',
-          type:'GET',
-          data: {"path":path },
-          success: function (data) {
-            showData(data);
-          },
-          error: function (data) {
-            console.error('Error:', data);
-          }
-        });
-    }
 
     function showData(data) {
         removeSelection();
@@ -167,7 +153,7 @@
     }
 
     function openDir(element){
-        ajaxRequest(element.getAttribute("path"));
+        getFiles(element.getAttribute("path"));
     }
 
     function showForm(name) {
@@ -261,14 +247,14 @@
             body: JSON.stringify(files)
         };
 
-        fetch('/api/delete_items', options)
+        fetch('/api/moveToTrash_items', options)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Ошибка при отправке данных на сервер');
                 }
                 let parent = document.getElementById("tbody").getAttribute("parent");
-                if(parent == "null") ajaxRequest("");
-                else ajaxRequest(parent);
+                if(parent == "null") getFiles("");
+                else getFiles(parent);
                 return response.text();
             })
             .then(responseText => {
@@ -321,8 +307,8 @@
                 // Обработка успешного ответа
                 console.log(data);
                 closeForm('upload_overlay');
-                if(parentAttribute == "null") ajaxRequest("");
-                else ajaxRequest(parentAttribute);
+                if(parentAttribute == "null") getFiles("");
+                else getFiles(parentAttribute);
             })
             .catch(error => {
                 // Обработка ошибок
@@ -372,8 +358,8 @@
                 // Обработка успешного ответа
                 console.log(data);
                 closeForm('create_folder_overlay');
-                if(parentAttribute == "null") ajaxRequest("");
-                else ajaxRequest(parentAttribute);
+                if(parentAttribute == "null") getFiles("");
+                else getFiles(parentAttribute);
             })
             .catch(error => {
                 // Обработка ошибок
@@ -421,8 +407,8 @@
                 // Обработка успешного ответа
                 console.log(data);
                 closeForm('rename_overlay');
-                if(parentAttribute == "null") ajaxRequest("");
-                else ajaxRequest(parentAttribute);
+                if(parentAttribute == "null") getFiles("");
+                else getFiles(parentAttribute);
             })
             .catch(error => {
                 // Обработка ошибок
