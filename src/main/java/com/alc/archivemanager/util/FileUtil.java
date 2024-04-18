@@ -1,6 +1,7 @@
 package com.alc.archivemanager.util;
 
 import com.alc.archivemanager.model.FileSystemItem;
+import com.alc.archivemanager.model.TrashFileItem;
 import com.alc.archivemanager.searchers.SearchProcesses;
 import com.google.common.io.Files;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,8 +15,6 @@ import java.util.UUID;
 
 public class FileUtil {
 
-    private static final String TRASH_FOLDER = "C:/WebPractice/archive-manager/src/main/resources/trashFolder";
-
     public static List<FileSystemItem> getFiles(String mainPath){
         File dir = new File(mainPath);
         File[] files = dir.listFiles();
@@ -25,6 +24,26 @@ public class FileUtil {
         if(files != null) {
             for (File file : files) {
                 result.add(new FileSystemItem(file));
+            }
+        }
+
+        return result;
+    }
+
+    public static List<TrashFileItem> getTrashedFiles(){
+        File dir = new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX);
+        File[] files = dir.listFiles();
+
+        List<TrashFileItem> result = new ArrayList<>();
+
+        if(files != null) {
+            for (File file : files) {
+                try {
+                    result.add(new TrashFileItem(file));
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -65,12 +84,12 @@ public class FileUtil {
     }
 
     private static boolean moveToTrash(File file){
-        File newLocation = new File(TRASH_FOLDER, file.getName());
+        File newLocation = new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName());
         try {
             java.nio.file.Files.move(file.toPath(), newLocation.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 
-            File metadataFile = new File(TRASH_FOLDER, file.getName() + ".metadata");
+            File metadataFile = getMetadata(file);
             metadataFile.createNewFile();
             java.nio.file.Files.write(metadataFile.toPath(), file.getAbsolutePath().getBytes());
 
@@ -91,7 +110,7 @@ public class FileUtil {
 
     private static boolean recoverFromTrash(File file){
 
-        File metadataFile = new File(file.getParent() + "\\" + file.getName() + ".metadata");
+        File metadataFile = getMetadata(file);
 
         try {
             // Восстановление файла
@@ -104,7 +123,7 @@ public class FileUtil {
                 java.nio.file.Files.move(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
             catch (java.nio.file.DirectoryNotEmptyException e){
-                targetFile.delete();
+                file.delete();
             }
             // Удаление метаданных
             metadataFile.delete();
@@ -116,8 +135,18 @@ public class FileUtil {
         return true;
     }
 
+    public static boolean deleteFileFromTrash(File file) {
+        File metadataFile = getMetadata(file);
+
+        return (file.delete() && metadataFile.delete());
+    }
+
     public static File getParsed(File file){
         return new File(file.getParent() + '\\' + Files.getNameWithoutExtension(file.getPath()) + '.' + SearchProcesses.PARSED);
+    }
+
+    public static File getMetadata(File file){
+        return new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName() + ".metadata");
     }
 
     public static String getCollisionFilePrefix(String fileName){

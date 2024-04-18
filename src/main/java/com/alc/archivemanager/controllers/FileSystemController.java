@@ -21,4 +21,9 @@ public class FileSystemController {
     public String uploadForm(){
         return "uploadForm";
     }
+
+    @GetMapping("/trash")
+    public String trash() {
+        return "trashPage";
+    }
 }

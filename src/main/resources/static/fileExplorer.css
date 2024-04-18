@@ -75,6 +75,14 @@ tbody tr:hover {
     background-image: url('/icons/edit.png');
 }
 
+.recover-ico{
+    background-image: url('/icons/recover.png');
+}
+
+.delete-all-ico{
+    background-image: url('/icons/delete-all.png');
+}
+
 .disp-none{
     display: none;
 }
@@ -85,4 +93,13 @@ tbody tr:hover {
 
 input.wide-block{
     width: 100%;
+}
+
+.parent-info{
+    color: #494949;
+    font-size: smaller;
+    margin: 0;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }

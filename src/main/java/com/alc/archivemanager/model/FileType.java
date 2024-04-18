@@ -4,5 +4,6 @@ public enum FileType{
     DIR,
     FILE,
     PARSED,
-    SHADOW
+    SHADOW,
+    METADATA
 }

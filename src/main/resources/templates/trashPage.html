@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trash</title>
+    <link th:href="@{/fileExplorer.css}" rel="stylesheet" />
+    <link th:href="@{/addFile.css}" rel="stylesheet" />
+    <!-- <link href="../static/fileExplorer.css" rel="stylesheet" /> -->
+    <!-- <link href="../static/addFile.css" rel="stylesheet" /> -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body onload="start()">
+<header class="header">
+    <div>
+        <button class="nav-btn recover-ico disp-none" id="recover-btn" onclick="recoverItems()" ></button>
+        <button class="nav-btn delete-all-ico" id="delete-all-btn" onclick="deleteAll()" ></button>
+        <button class="nav-btn delete-ico disp-none" id="delete-btn" onclick="showForm('delete_overlay')" ></button>
+        <button class="nav-btn cross-ico disp-none" id="remove-select-btn" onclick="removeSelection()" ></button>
+    </div>
+</header>
+
+
+<div id="delete_overlay" class="overlay">
+    <div id="delete-form" class="form">
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
+        <h2>Безвозвратно удалить элементы: <span id="delete-count"></span>?</h2>
+        <div class="button-container">
+            <input type="button" value="Нет" onclick="closeForm(this.parentElement.parentElement.parentElement.id)">
+            <input type="button" value="Да" onclick="deleteItems()">
+        </div>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <td>
+                Тип
+            </td>
+            <td>
+                Имя файла
+            </td>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+</table>
+
+</body>
+</html>
+
+<script>
+    let selectedRows = [];
+    function start() {
+        getFiles();
+    }
+
+    function getFiles(){
+    $.ajax({
+        url: '/api/get_trashed_files',
+        dataType:'json',
+        type:'GET',
+        success: function (data) {
+        showData(data);
+        },
+        error: function (data) {
+        console.error('Error:', data);
+        }
+    });
+    }
+
+    function showData(data) {
+        removeSelection();
+        const tbody = document.getElementById("tbody");
+        $('tbody').empty();
+
+        data.forEach(element => {
+            if(element.fileType != "PARSED" && element.fileType != "METADATA"){
+                let row = addRow(element.name, element.fileType, element.path, element.parent); 
+                tbody.append(row);
+            }
+        });
+    }
+
+    function addRow(name, fileType, path, parent){
+        const row = document.createElement('tr');
+                const fileName = document.createElement("td");
+                fileName.innerHTML = name + "<br> <p class=\"parent-info\" title=\"" + parent + "\"> Исходное расположение: " + parent + "</p>";
+                const extension = document.createElement("td");
+                extension.innerHTML = fileType;
+                row.setAttribute("path", path);
+                row.setAttribute("class", "fs-item");
+
+                row.setAttribute("onclick", "rowClick(event)");
+
+                row.append(extension);
+                row.append(fileName);
+        
+        return row;
+    }
+
+    function showForm(name) {
+        document.getElementById(name).style.display = 'flex';
+        if(name == "delete_overlay"){
+            document.getElementById("delete-count").innerText = selectedRows.length;
+        }
+    }
+
+    function showButton(name) {
+        document.getElementById(name).style.display = "inline";
+    }
+
+    function hideButton(name) {
+        document.getElementById(name).style.display = "none";
+    }
+
+
+    function closeForm(name) {
+        document.getElementById(name).style.display = 'none';
+    }
+
+    function rowClick(event){
+        let target = event.target;
+
+        var row = target.parentElement;
+
+        if (target.tagName === "P"){
+            row = row.parentElement;
+        }
+            
+
+        // Переключаем состояние выделения строки
+        if (row.classList.contains("selected-item")) {
+            row.classList.remove("selected-item");
+            // Удаляем элемент из массива выделенных, если он был выделен
+            var index = selectedRows.indexOf(row);
+            if (index !== -1) {
+                selectedRows.splice(index, 1);
+            }
+            if(selectedRows.length == 0){
+                hideButton("delete-btn");
+                hideButton("recover-btn");
+                hideButton("remove-select-btn");
+            }
+        } else {
+            row.classList.add("selected-item");
+            showButton("delete-btn");
+            showButton("remove-select-btn");
+            showButton("recover-btn");
+
+            // Добавляем элемент в массив выделенных
+            selectedRows.push(row);
+        }
+    }
+
+    function removeSelection(){
+        selectedRows.forEach(element => {
+            if (element.classList.contains("selected-item")) {
+                element.classList.remove("selected-item");
+            }
+        });
+        selectedRows = [];
+        hideButton("delete-btn");
+        hideButton("recover-btn");
+        hideButton("remove-select-btn");
+    }
+
+    function filesConstructor(){
+        let files = [];
+        selectedRows.forEach(element => {
+            files.push(element.getAttribute("path"));
+        })
+
+        return files
+    }
+
+    function deleteItems(){
+        closeForm("delete_overlay");
+        recoverOrDeleteItems('/api/delete_from_trash_items', 'DELETE', filesConstructor());
+    }
+
+    function recoverItems(){
+        recoverOrDeleteItems('/api/recover_items', 'PUT', filesConstructor());
+    }
+
+    function deleteAll(){
+        let files = [];
+        for(let element of document.getElementById("tbody").children){
+            files.push(element.getAttribute("path"));
+        }
+
+        recoverOrDeleteItems('/api/delete_from_trash_items', 'DELETE', files);
+    }
+
+    function recoverOrDeleteItems(url, method, files){
+
+        var options = {
+            method: method,
+            headers: {
+                    'Content-Type': 'application/json',
+                },
+            body: JSON.stringify(files)
+        };
+
+        fetch(url, options)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка при отправке данных на сервер');
+                }
+                getFiles();
+
+                return response.text();
+            })
+            .then(responseText => {
+                console.log(responseText);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        removeSelection();
+        
+    }
+
+</script>

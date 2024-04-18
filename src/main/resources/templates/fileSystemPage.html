@@ -8,7 +8,6 @@
     <!-- <link href="../static/fileExplorer.css" rel="stylesheet" /> -->
     <!-- <link href="../static/addFile.css" rel="stylesheet" /> -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script th:src="@{/scripts/getFiles.js}"></script>
 </head>
 <body onload="start()">
 <header class="header">
@@ -102,6 +101,22 @@
         event.preventDefault();
         rename();
     });
+
+
+    function getFiles(path){
+        $.ajax({
+            url: '/api/get_files',
+            dataType:'json',
+            type:'GET',
+            data: {"path":path },
+            success: function (data) {
+            showData(data);
+            },
+            error: function (data) {
+            console.error('Error:', data);
+            }
+        });
+    }
 
     function showData(data) {
         removeSelection();
@@ -247,7 +262,7 @@
             body: JSON.stringify(files)
         };
 
-        fetch('/api/moveToTrash_items', options)
+        fetch('/api/move_to_trash_items', options)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Ошибка при отправке данных на сервер');

@@ -3,10 +3,12 @@ package com.alc.archivemanager.controllers;
 import com.alc.archivemanager.model.FileSystemItem;
 import com.alc.archivemanager.model.FileType;
 import com.alc.archivemanager.model.SearchResult;
+import com.alc.archivemanager.model.TrashFileItem;
 import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
 import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
+import com.alc.archivemanager.util.FilePaths;
 import com.alc.archivemanager.util.FileUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -27,10 +29,6 @@ import java.util.List;
 @RequestMapping("/api")
 public class RestApiController {
 
-    private final String MAIN_PATH = "C:/WebPractice/archive-manager/src/main/resources/";
-    private final String STORAGE_SUFFIX = "storage/";
-    private final String TRASH_SUFFIX = "trashFolder/";
-
     @GetMapping("/search")
     public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "method", required = false) String method,
                                      @RequestParam("search_param") String search_param) throws Exception {
@@ -44,7 +42,7 @@ public class RestApiController {
                 default -> new ApacheLuceneSearcher();
             };
 
-            List<SearchResult> searchResult = searcher.searchProcess(MAIN_PATH + STORAGE_SUFFIX, search_param);
+            List<SearchResult> searchResult = searcher.searchProcess(FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX, search_param);
             searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
             return new ResponseEntity<>(searchResult, HttpStatus.OK);
         }
@@ -59,10 +57,17 @@ public class RestApiController {
             @RequestParam(name = "path", required = false) String path
     ) {
         if (path != null) if (path.contains("..")) return new ResponseEntity<>(HttpStatus.LOCKED);
-        List<FileSystemItem> files = FileUtil.getFiles(path == null || path.isEmpty() ? MAIN_PATH + STORAGE_SUFFIX : MAIN_PATH + path);
+        List<FileSystemItem> files = FileUtil.getFiles(path == null || path.isEmpty() ? FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX : FilePaths.MAIN_PATH + path);
         if(files.isEmpty()){
             files.add(new FileSystemItem(path, FileType.SHADOW, path));
         }
+        return new ResponseEntity<>(files, HttpStatus.OK);
+    }
+
+    @GetMapping("/get_trashed_files")
+    public ResponseEntity<List<TrashFileItem>> getTrashedFiles() {
+
+        List<TrashFileItem> files = FileUtil.getTrashedFiles();
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
@@ -77,9 +82,9 @@ public class RestApiController {
 
         // Проверяем, было ли передано место для сохранения файла
         if (destination.isEmpty() || destination.equals("null")) {
-            destination = MAIN_PATH + STORAGE_SUFFIX;
+            destination = FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX;
         }
-        else destination  = MAIN_PATH + destination;
+        else destination  = FilePaths.MAIN_PATH + destination;
 
         if (!destination.contains("storage") || destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
@@ -98,9 +103,9 @@ public class RestApiController {
         String fullPath;
 
         if (destination.isEmpty() || destination.equals("null")) {
-            fullPath = MAIN_PATH + STORAGE_SUFFIX;
+            fullPath = FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX;
         }
-        else fullPath  = MAIN_PATH + destination;
+        else fullPath  = FilePaths.MAIN_PATH + destination;
         fullPath += "/" + folderName;
 
         if (!fullPath.contains("storage") || destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
@@ -124,12 +129,12 @@ public class RestApiController {
         }
     }
 
-    @DeleteMapping("/moveToTrash_items")
+    @DeleteMapping("/move_to_trash_items")
     public ResponseEntity<String> moveToTrashItems(@RequestBody String[] items){
 
 
         for (String item : items) {
-            File file = new File(MAIN_PATH + item);
+            File file = new File(FilePaths.MAIN_PATH + item);
 
             if (!file.getPath().contains("storage") || item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
@@ -140,14 +145,30 @@ public class RestApiController {
         return new ResponseEntity<>("Удалено.", HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete_from_trash_items")
+    public ResponseEntity<String> deleteFromTrashItems(@RequestBody String[] items){
+
+
+        for (String item : items) {
+            File file = new File(FilePaths.MAIN_PATH + item);
+
+            if (!file.getPath().contains(FilePaths.TRASH_SUFFIX) || item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+
+            if(file.exists()){
+                if(!FileUtil.deleteFileFromTrash(file)) return new ResponseEntity<>("Ошибка удаления.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        return new ResponseEntity<>("Удалено.", HttpStatus.OK);
+    }
+
 
     @PutMapping("/recover_items")
     public ResponseEntity<String> recoverItems(@RequestBody String[] items){
 
         for (String item : items) {
-            File file = new File(MAIN_PATH + TRASH_SUFFIX + item);
+            File file = new File(FilePaths.MAIN_PATH + item);
 
-            if (item.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+            if (item.contains("..") || !item.contains(FilePaths.TRASH_SUFFIX)) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
             if(file.exists()){
                 if(!FileUtil.recoverFile(file)) return new ResponseEntity<>("Ошибка восстановления.", HttpStatus.BAD_REQUEST);
@@ -163,7 +184,7 @@ public class RestApiController {
             @RequestParam("new_name") String newName) {
         try {
             // Путь к файлу
-            String fileFullPath = MAIN_PATH + filePath;
+            String fileFullPath = FilePaths.MAIN_PATH + filePath;
 
             if (!fileFullPath.contains("storage") || fileFullPath.contains("..") || newName.contains("..") || newName.contains("\\") || newName.contains("/")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
@@ -189,7 +210,7 @@ public class RestApiController {
     @GetMapping("/download_file")
     public ResponseEntity<Resource> downloadFile(@RequestParam("path") String filePath) throws IOException {
         // Здесь необходимо указать путь к папке, в которой хранятся ваши файлы
-        Path file = Path.of(MAIN_PATH, filePath);
+        Path file = Path.of(FilePaths.MAIN_PATH, filePath);
 
         if (!file.toString().contains("storage") || file.toString().contains("..")) return new ResponseEntity<>(null, HttpStatus.LOCKED);
 

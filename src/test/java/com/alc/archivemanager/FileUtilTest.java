@@ -1,9 +1,10 @@
 package com.alc.archivemanager;
 
+import com.alc.archivemanager.controllers.RestApiController;
 import com.alc.archivemanager.util.FileUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -41,5 +42,25 @@ public class FileUtilTest {
 
         assertThat(file.exists() && !trashed.exists()).isTrue();
         file.delete();
+    }
+
+
+    @Test
+    public void deleteFromTrashTest() throws IOException {
+        File file = new File(TRASH_FOLDER, "testFile");
+        file.createNewFile();
+        File metadata = new File(TRASH_FOLDER, "testFile.metadata");
+        metadata.createNewFile();
+
+        FileUtil.deleteFileFromTrash(file);
+
+        assertThat(!file.exists() && !metadata.exists()).isTrue();
+    }
+
+    @Test
+    public void deleteFromAnotherFolderTest() {
+        RestApiController controller = new RestApiController();
+
+        assertThat(controller.deleteFromTrashItems(new String[]{"/storage/testFile"}).toString()).isEqualTo("<423 LOCKED Locked,Отказано в доступе,[]>");
     }
 }
