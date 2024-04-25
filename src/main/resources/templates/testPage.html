@@ -4,22 +4,26 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link th:href="@{/styles.css}" rel="stylesheet" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.7.1/viewer.min.css"> -->
 </head>
 <body>
 
-<div class="search_res">
-    <form method="GET" th:action="@{/test}">
-        <button type="submit">Parse</button>
-    </form>
-</div>
+    <a href="/ViewerJS/#../storage/ГОСТ 19.104-78.pdf">хуй</a>
 
-<div th:if="${message}" class="search_res">
-    <p th:text="${message}"></p>
-</div>
+    <iframe src="/storage/ГОСТ 19.104-78.pdf" width="100%" height="100%" frameborder="0"></iframe>
+    <!-- <div id="document-preview">
+        <a href="/ViewerJS/#../storage/ГОСТ 19.104-78.pdf">хуй</a>
+        <img src="/storage/ГОСТ 19.104-78.pdf" alt="Document" data-src="/storage/ГОСТ 19.104-78.pdf">
+    </div>
 
-<div th:if="${search_result}">
-    <p th:text="${search_result}"></p>
-</div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.7.1/viewer.min.js"></script>
+    <script>
+        const viewer = new Viewer(document.getElementById('document-preview'), {
+            inline: false,
+            viewed() {
+                viewer.zoomTo(1);
+            }
+        });
+    </script> -->
 </body>
 </html>

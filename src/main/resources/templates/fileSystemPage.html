@@ -17,6 +17,14 @@
         <button class="nav-btn delete-ico disp-none" id="delete-btn" onclick="showForm('delete_overlay')" ></button>
         <button class="nav-btn cross-ico disp-none" id="remove-select-btn" onclick="removeSelection()" ></button>
         <button class="nav-btn edit-ico disp-none" id="rename-btn" onclick="showForm('rename_overlay')" ></button>
+
+        <div class="search-container" id="search-container">
+            <input type="text" id="search-bar" placeholder="Поиск...">
+            <button type="submit" class="search-ico" id="search-button" 
+            onclick="search((this.classList.contains('search-ico') ? 'apache' : 'neuro'))" 
+            oncontextmenu="switchMode(event, this)"
+            title="Классический поиск (пкм для смены режима)"><i class="fa fa-search"></i></button>
+        </div>
     </div>
 </header>
 
@@ -64,6 +72,14 @@
             <input type="button" value="Нет" onclick="closeForm(this.parentElement.parentElement.parentElement.id)">
             <input type="button" value="Да" onclick="deleteItems()">
         </div>
+    </div>
+</div>
+
+<div id="search_overlay" class="overlay">
+    <div class="loading-spinner"></div>
+    <div class="search-form">
+        <span id="close-btn" class="close-btn" onclick="closeForm(this.parentElement.parentElement.id)">&times;</span>
+        <div id="search-results"></div>
     </div>
 </div>
 
@@ -172,12 +188,16 @@
     }
 
     function showForm(name) {
-        document.getElementById(name).style.display = 'flex';
+        element = document.getElementById(name);
+        element.style.display = 'flex';
         if(name == "delete_overlay"){
             document.getElementById("delete-count").innerText = selectedRows.length;
         }
         if(name == "rename_overlay"){
             document.getElementById('new_name').value = selectedRows[0].cells[1].innerText;
+        }
+        if(name == 'search_overlay'){
+            document.getElementById('search-container').style.marginRight = '28px';
         }
     }
 
@@ -191,7 +211,11 @@
 
 
     function closeForm(name) {
-        document.getElementById(name).style.display = 'none';
+        element = document.getElementById(name);
+        element.style.display = 'none';
+        if(name == 'search_overlay'){
+            document.getElementById('search-container').style.marginRight = '';
+        }
     }
 
     function rowClick(event){
@@ -459,6 +483,65 @@
         } catch (error) {
             console.error('При загрузке файла произошла ошибка:', error);
         }
+    }
+
+    function switchMode(event, btn){
+        event.preventDefault();
+        if(btn.classList.contains('search-ico')){
+            btn.classList.remove('search-ico');
+            btn.classList.add('neuro-ico');
+            btn.setAttribute('title', 'Классический поиск (пкм для смены режима)')
+            return;
+        }
+
+        if(btn.classList.contains('neuro-ico')){
+            btn.classList.remove('neuro-ico');
+            btn.classList.add('search-ico');
+            btn.setAttribute('title', 'Нейронный поиск (пкм для смены режима)')
+            return;
+        }
+    }
+
+    function search(method){
+        // Блокировка кнопки
+        showForm('search_overlay');
+        let btn = document.getElementById("search-button");
+        btn.disabled = true; 
+
+        // Отобразить колесо загрузки
+        $('.loading-spinner').show();
+
+        // Отправить AJAX-запрос на бэкенд
+        $.ajax({
+            type: 'GET',
+            url: '/api/search',
+            data: { 'method' : method, 'search_param' : document.getElementById('search-bar').value},
+            success: function(response) {
+                // Скрыть колесо загрузки
+                $('.loading-spinner').hide();
+
+                // Очистить текущие результаты
+                $('#search-results').empty();
+
+                // Обработать полученные результаты
+                response.forEach(function(result) {
+                    var resultElement = $('<div class="search_res"></div>');
+                    resultElement.append('<p>Имя файла: <span>' + result.shortFileName + '</span></p>');
+                    resultElement.append('<details><summary>Краткий ответ: <span>' + (result.Answer ? result.Answer : "") + '</span></summary><p>' + result.PageText + '</p></details>');
+                    resultElement.append('<p>Вероятность: <span>' + result.Coincidence + '</span></p>');
+
+                    // Добавить результат в контейнер для результатов поиска
+                    $('#search-results').append(resultElement);
+                });
+                btn.disabled = false;
+            },
+            error: function(error) {
+                // Скрыть колесо загрузки в случае ошибки
+                $('.loading-spinner').hide();
+                console.error('Error:', error);
+                btn.disabled = false;
+            }
+        });
     }
 
 </script>

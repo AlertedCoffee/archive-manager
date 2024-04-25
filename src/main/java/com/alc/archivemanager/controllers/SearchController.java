@@ -36,26 +36,7 @@ public class SearchController {
     }
 
     @GetMapping("/test")
-    public String test(Model model,
-                        @ModelAttribute(MESSAGE_ATTRIBUTE) String message
-    ) throws Exception {
-
-        if(message == null || message.isEmpty()) {
-            long start = System.currentTimeMillis();
-
-            IParser iParser = new ApacheODFHelper();
-            String text = iParser.parse("C:/WebPractice/archive-manager/src/main/resources/storage/Техническое задание.odt");
-
-            model.addAttribute(SEARCH_RESULT_ATTRIBUTE, text);
-            long end = System.currentTimeMillis();
-
-            model.addAttribute(MESSAGE_ATTRIBUTE, "Время парсинга: " + (end - start) + "мс");
-        }
-        else {
-            model.addAttribute(MESSAGE_ATTRIBUTE, message);
-        }
-
-
+    public String test() throws Exception {
 
         return "/testPage";
     }

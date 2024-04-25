@@ -12,6 +12,46 @@ header {
     text-align: center;
 }
 
+.search-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 18px;
+    z-index: 5;
+}
+
+.search-container input[type=text] {
+    padding: 8px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+    font-size: 14px;
+    width: 200px;
+}
+
+.search-container button[type=submit] {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    top: -4px;
+    position: relative;
+    background-size: cover;
+}
+
+.search-container button[type=submit]:hover {
+    background-color: #cccccc;
+}
+
+.search-container button[type=submit] i {
+    font-size: 16px;
+}
+
+
 table {
     width: 80%;
     margin: 20px auto;
@@ -83,6 +123,14 @@ tbody tr:hover {
     background-image: url('/icons/delete-all.png');
 }
 
+.search-ico{
+    background-image: url('/icons/search.png');
+}
+
+.neuro-ico{
+    background-image: url('/icons/neuro.png');
+}
+
 .disp-none{
     display: none;
 }
@@ -102,4 +150,45 @@ input.wide-block{
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis;
+}
+
+.search-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    margin: 25px;
+    margin-top: 70px;
+    height: 80%;
+    width: 100%;
+    overflow: auto;
+}
+
+p {
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+  
+.search_res {
+    padding: 5px;
+}
+
+.loading-spinner {
+    display: none;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -15px;
+    margin-left: -15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

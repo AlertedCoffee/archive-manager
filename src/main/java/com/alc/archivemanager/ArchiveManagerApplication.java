@@ -1,18 +1,30 @@
 package com.alc.archivemanager;
 
 import com.alc.archivemanager.model.FileSystemItem;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 
 @SpringBootApplication
-public class ArchiveManagerApplication {
+public class ArchiveManagerApplication extends SpringBootServletInitializer {
+	@Value("${upload.path}")
+	private String uploadPath;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ArchiveManagerApplication.class, args);
-		FileSystemItem fi = new FileSystemItem(new File("C:/WebPractice/archive-manager/src/main/resources/storage/test/Техническое задание.docx"));
-//		ISearcher searcher = new ApacheLuceneSearcher();
-//		searcher.searchProcess("C:/WebPractice/archive-manager/src/main/resources/storage", "руководство оператора");
+	}
+	@Configuration
+	public class WebConfig implements WebMvcConfigurer {
+		@Override
+		public void addResourceHandlers(ResourceHandlerRegistry registry) {
+			registry.addResourceHandler("/storage/**")
+					.addResourceLocations("classpath:/storage/");
+		}
 	}
 }
