@@ -1,5 +1,6 @@
 package com.alc.archivemanager.util;
 
+import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.model.FileSystemItem;
 import com.alc.archivemanager.model.TrashFileItem;
 import com.alc.archivemanager.searchers.SearchProcesses;

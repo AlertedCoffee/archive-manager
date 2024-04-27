@@ -1,6 +1,6 @@
 package com.alc.archivemanager.model;
 
-import com.alc.archivemanager.util.FilePaths;
+import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.util.FileUtil;
 import com.google.common.io.Files;
 

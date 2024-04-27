@@ -1,21 +1,29 @@
 package com.alc.archivemanager.controllers;
 
-import com.alc.archivemanager.model.FileSystemItem;
-import com.alc.archivemanager.model.FileType;
-import com.alc.archivemanager.model.SearchResult;
-import com.alc.archivemanager.model.TrashFileItem;
+import com.alc.archivemanager.config.ArchiveUserDetails;
+import com.alc.archivemanager.model.*;
+import com.alc.archivemanager.repository.UserRepository;
 import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
 import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
-import com.alc.archivemanager.util.FilePaths;
+import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.util.FileUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +36,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class RestApiController {
+    @Autowired
+    private UserRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @GetMapping("/user_info")
+    public String[] userInfo(HttpServletRequest request){
+        return ((ArchiveUserDetails)((Authentication)request.getUserPrincipal()).getPrincipal()).getRoles();
+    }
 
     @GetMapping("/search")
     public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "method", required = false) String method,
@@ -146,6 +163,7 @@ public class RestApiController {
     }
 
     @DeleteMapping("/delete_from_trash_items")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<String> deleteFromTrashItems(@RequestBody String[] items){
 
 
@@ -226,4 +244,15 @@ public class RestApiController {
         }
     }
 
+    @PostMapping("/add_user")
+    public String addUser(@RequestBody ArchiveUser user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        try {
+            repository.save(user);
+        }
+        catch (DataIntegrityViolationException e){
+            return "Пользователь с таким именем уже существует.";
+        }
+        return "Добавлено.";
+    }
 }

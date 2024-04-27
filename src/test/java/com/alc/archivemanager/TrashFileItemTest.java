@@ -1,7 +1,7 @@
 package com.alc.archivemanager;
 
 import com.alc.archivemanager.model.TrashFileItem;
-import com.alc.archivemanager.util.FilePaths;
+import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.util.FileUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

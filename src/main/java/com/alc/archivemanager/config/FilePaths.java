@@ -1,4 +1,4 @@
-package com.alc.archivemanager.util;
+package com.alc.archivemanager.config;
 
 public class FilePaths {
     public static final String MAIN_PATH = "C:/WebPractice/archive-manager/src/main/resources/";

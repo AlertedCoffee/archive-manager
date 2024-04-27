@@ -2,6 +2,7 @@ package com.alc.archivemanager.controllers;
 
 import com.alc.archivemanager.model.FileSystemItem;
 import com.alc.archivemanager.util.FileUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
