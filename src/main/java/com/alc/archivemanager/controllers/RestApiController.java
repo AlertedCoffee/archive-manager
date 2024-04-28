@@ -131,7 +131,7 @@ public class RestApiController {
         else fullPath  = FilePaths.MAIN_PATH + destination;
         fullPath += "/" + folderName;
 
-        if (!fullPath.contains("storage") || destination.contains("..")) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
+        if (!fullPath.contains("storage") || fullPath.contains("..")) return ResponseEntity.status(HttpStatus.LOCKED).body("Отказано в доступе.");
 
         try {
             File folder = new File(fullPath);
@@ -227,7 +227,7 @@ public class RestApiController {
                 return ResponseEntity.badRequest().body("Не удалось переименовать файл.");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Внутренняя ошибка сервера: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Внутренняя ошибка сервера: " + e.getMessage());
         }
     }
 

@@ -5,7 +5,9 @@
     <title>FileSystem</title>
     <link th:href="@{/fileExplorer.css}" rel="stylesheet" />
     <link th:href="@{/addFile.css}" rel="stylesheet" />
+    <link th:href="@{/popupError.css}" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script th:src="@{/scripts/popupError.js}"></script>
 </head>
 <body onload="start()">
 <header class="header">
@@ -81,6 +83,11 @@
     </div>
 </div>
 
+<div id="errorPopup" class="error-popup">
+    <span id="errorMessage" class="error-message">Произошла ошибка!</span>
+    <span class="close-popup-btn" onclick="closeErrorPopup()">X</span>
+</div>
+
 <table>
     <thead>
         <tr>
@@ -128,6 +135,9 @@
             },
             error: function (data) {
             console.error('Error:', data);
+            if(data.status == 423){
+                openErrorPopup("Отказано в доступе.")
+            }
             }
         });
     }
@@ -195,7 +205,7 @@
             document.getElementById('new_name').value = selectedRows[0].cells[1].innerText;
         }
         if(name == 'search_overlay'){
-            document.getElementById('search-container').style.marginRight = '28px';
+            document.getElementById('search-container').classList.add('on-top');
         }
     }
 
@@ -212,7 +222,7 @@
         element = document.getElementById(name);
         element.style.display = 'none';
         if(name == 'search_overlay'){
-            document.getElementById('search-container').style.marginRight = '';
+            document.getElementById('search-container').classList.remove('on-top');
         }
     }
 
@@ -337,6 +347,13 @@
                 if (response.ok) {
                     return response.text();
                 } else {
+                    if(response.status==400){
+                        throw new Error("Файл не выбран.");
+                    }
+                    if(response.status==423)
+                    {
+                        throw new Error("Отказано в доступе.");
+                    }
                     throw new Error('Ошибка загрузки файла');
                 }
             })
@@ -350,6 +367,7 @@
             .catch(error => {
                 // Обработка ошибок
                 console.error('Произошла ошибка:', error.message);
+                openErrorPopup(error.message);
             });
     }
 
@@ -386,7 +404,11 @@
                     return response.text();
                 } else {
                     if(response.status==400){
-                        alert("Папка уже существует")
+                        throw new Error("Папка уже существует.");
+                    }
+                    if(response.status==423)
+                    {
+                        throw new Error("Отказано в доступе.");
                     }
                     throw new Error('Ошибка создания папки');
                 }
@@ -401,6 +423,7 @@
             .catch(error => {
                 // Обработка ошибок
                 console.error('Произошла ошибка:', error.message);
+                openErrorPopup(error.message);
             });
     }
 
@@ -432,10 +455,11 @@
                     return response.text();
                 } else {
                     if(response.status==400){
-                        alert("Недопустимое имя")
+                        throw new Error("Недопустимое имя.");
                     }
-                    if(response.status==423){
-                        alert("Отказано в доступе")
+                    if(response.status==423)
+                    {
+                        throw new Error("Отказано в доступе.");
                     }
                     throw new Error('Ошибка переименования.');
                 }
@@ -450,6 +474,7 @@
             .catch(error => {
                 // Обработка ошибок
                 console.error('Произошла ошибка:', error.message);
+                openErrorPopup(error.message);
             });
     }
 
@@ -476,10 +501,18 @@
 
                 console.log('Файл скачен: ', fileName);
             } else {
-                console.error('Не удалось загрузить файл:', response.statusText);
+                if(response.status==404){
+                        throw new Error("Файл не найден.");
+                }
+                if(response.status==423)
+                {
+                    throw new Error("Отказано в доступе.");
+                }
+                throw new Error('Не удалось загрузить файл.');
             }
         } catch (error) {
-            console.error('При загрузке файла произошла ошибка:', error);
+            console.error('При загрузке файла произошла ошибка: ', error.message);
+            openErrorPopup(error.message)
         }
     }
 

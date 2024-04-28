@@ -1,0 +1,23 @@
+.error-popup {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    padding: 20px;
+    background-color: #ffcccc;
+    border: 2px solid #ff0000;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+.error-message {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.close-popup-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+}
