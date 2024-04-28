@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").authenticated()
                         .requestMatchers("/trash").authenticated()
+                        .requestMatchers("/storage").authenticated()
                         .requestMatchers("api/add_user").permitAll()
                         .requestMatchers("api/**").authenticated()
 

@@ -8,9 +8,11 @@ import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
 import com.alc.archivemanager.searchers.ISearcher;
 import com.alc.archivemanager.config.FilePaths;
+import com.alc.archivemanager.servises.ArchiveUserService;
 import com.alc.archivemanager.util.FileUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -36,10 +38,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class RestApiController {
+
     @Autowired
-    private UserRepository repository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    ArchiveUserService archiveUserService;
 
     @GetMapping("/user_info")
     public String[] userInfo(HttpServletRequest request){
@@ -47,8 +48,13 @@ public class RestApiController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<SearchResult>> search(@RequestParam(name = "method", required = false) String method,
-                                     @RequestParam("search_param") String search_param) throws Exception {
+    public ResponseEntity<?> search(@RequestParam(name = "method", required = false) String method,
+                                                     @RequestParam("search_param") String search_param,
+                                                     @RequestParam("destination") String destination
+    ) throws Exception {
+
+        destination = destination.equals("null") ? FilePaths.STORAGE_SUFFIX : destination;
+        if(destination.contains("..") || !destination.contains(FilePaths.STORAGE_SUFFIX)) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         try {
             if (search_param == null || search_param.isEmpty()) throw new Exception("Параметр поиска не задан");
@@ -59,7 +65,7 @@ public class RestApiController {
                 default -> new ApacheLuceneSearcher();
             };
 
-            List<SearchResult> searchResult = searcher.searchProcess(FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX, search_param);
+            List<SearchResult> searchResult = searcher.searchProcess(FilePaths.MAIN_PATH + destination, search_param);
             searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
             return new ResponseEntity<>(searchResult, HttpStatus.OK);
         }
@@ -246,13 +252,11 @@ public class RestApiController {
 
     @PostMapping("/add_user")
     public String addUser(@RequestBody ArchiveUser user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        try {
-            repository.save(user);
-        }
-        catch (DataIntegrityViolationException e){
-            return "Пользователь с таким именем уже существует.";
-        }
-        return "Добавлено.";
+        return archiveUserService.addUser(user);
+    }
+
+    @GetMapping("/get_users")
+    public List<ArchiveUser> getUsers(){
+        return archiveUserService.getAll();
     }
 }

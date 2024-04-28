@@ -19,12 +19,4 @@ public class ArchiveManagerApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(ArchiveManagerApplication.class, args);
 	}
-	@Configuration
-	public class WebConfig implements WebMvcConfigurer {
-		@Override
-		public void addResourceHandlers(ResourceHandlerRegistry registry) {
-			registry.addResourceHandler("/storage/**")
-					.addResourceLocations("classpath:/storage/");
-		}
-	}
 }
