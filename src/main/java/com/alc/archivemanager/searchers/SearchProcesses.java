@@ -1,5 +1,6 @@
 package com.alc.archivemanager.searchers;
 
+import com.alc.archivemanager.model.FileNamePairParsed;
 import com.alc.archivemanager.parsers.*;
 import com.alc.archivemanager.util.FileUtil;
 
@@ -24,9 +25,9 @@ public abstract class SearchProcesses implements ISearcher{
         return parsedAttributes.lastModifiedTime().toMillis() > fileAttributes.lastModifiedTime().toMillis();
     }
 
-    protected static List<String> getContent(File file)
+    protected static List<FileNamePairParsed> getContent(File file)
     {
-        List<String> content = new ArrayList<>();
+        List<FileNamePairParsed> content = new ArrayList<>();
 
 
         if (file.isFile()) {
@@ -37,14 +38,14 @@ public abstract class SearchProcesses implements ISearcher{
                     File parsed = FileUtil.getParsed(file);
 
                     if (parsed.exists() && checkAttributes(file, parsed)) {
-                        content.add(parsed.getPath());
+                        content.add(new FileNamePairParsed(file.getPath(), parsed.getPath()));
                     } else {
-                        content.add(file.getPath());
+                        content.add(new FileNamePairParsed(file.getPath()));
                     }
                 }
             }
             catch (Exception e){
-                content.add(file.getPath());
+                content.add(new FileNamePairParsed(file.getPath()));
                 e.printStackTrace();
             }
         }

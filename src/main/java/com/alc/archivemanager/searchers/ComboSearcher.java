@@ -1,7 +1,10 @@
 package com.alc.archivemanager.searchers;
 
+import com.alc.archivemanager.model.FileNamePairParsed;
 import com.alc.archivemanager.model.SearchResult;
+import com.alc.archivemanager.util.FileUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +26,13 @@ public class ComboSearcher implements ISearcher{
 
         DeepPavlovSearcher pavlov = new DeepPavlovSearcher();
 
-        List<String> files = new ArrayList<>();
-        for(SearchResult result : apacheResult) files.add(result.FileName);
+        List<FileNamePairParsed> files = new ArrayList<>();
+        for(SearchResult result : apacheResult) {
+            File parsed = FileUtil.getParsed(new File(result.FileName));
+
+            if (parsed.exists()) files.add(new FileNamePairParsed(result.FileName, parsed.getPath()));
+            else files.add(new FileNamePairParsed(result.FileName));
+        }
 
         List<SearchResult> pavlovResult = pavlov.searchProcess(files, searchParam);
 

@@ -3,20 +3,18 @@ package com.alc.archivemanager.model;
 import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.util.FileUtil;
 import com.google.common.io.Files;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
 
+@Getter
+@AllArgsConstructor
 public class TrashFileItem {
     private final String path;
     private final FileType fileType;
     private final String parent;
-
-    public TrashFileItem(String path, FileType fileType, String parent) {
-        this.path = path;
-        this.fileType = fileType;
-        this.parent = parent;
-    }
 
     public TrashFileItem(File file) throws IOException {
         String path = file.getPath();
@@ -58,15 +56,4 @@ public class TrashFileItem {
         return path.substring(path.lastIndexOf("\\") + 1);
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public FileType getFileType() {
-        return fileType;
-    }
 }

@@ -1,19 +1,17 @@
 package com.alc.archivemanager.model;
 
 import com.google.common.io.Files;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.File;
 
+@Getter
+@AllArgsConstructor
 public class FileSystemItem {
     private final String path;
     private final FileType fileType;
     private final String parent;
-
-    public FileSystemItem(String path, FileType fileType, String parent) {
-        this.path = path;
-        this.fileType = fileType;
-        this.parent = parent;
-    }
 
     public FileSystemItem(File file) {
         String path = file.getPath();
@@ -53,15 +51,4 @@ public class FileSystemItem {
         return path.substring(path.lastIndexOf("\\") + 1);
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public String getParent() {
-        return parent;
-    }
-
-    public FileType getFileType() {
-        return fileType;
-    }
 }

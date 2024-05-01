@@ -1,6 +1,7 @@
 package com.alc.archivemanager.searchers;
 
 import com.alc.archivemanager.model.DeepPavlovApiRequest;
+import com.alc.archivemanager.model.FileNamePairParsed;
 import com.alc.archivemanager.model.SearchResult;
 import com.alc.archivemanager.parsers.IParser;
 import com.google.gson.Gson;
@@ -136,25 +137,25 @@ public class DeepPavlovSearcher extends SearchProcesses{
         if(!dir.exists())
             return null;
 
-        List<String> files = new ArrayList<>(getContent(dir));
+        List<FileNamePairParsed> files = new ArrayList<>(getContent(dir));
 
         return searchProcess(files, searchParam);
     }
 
-    public List<SearchResult> searchProcess(List<String> files, String searchParam){
+    public List<SearchResult> searchProcess(List<FileNamePairParsed> files, String searchParam){
         List<SearchResult> searchResults;
 
         List<String> texts = new ArrayList<>();
         List<String> searchParams = new ArrayList<>();
         List<String> returnedFiles = new ArrayList<>();
 
-        for (String file : files){
+        for (FileNamePairParsed file : files){
             try {
-                IParser parser = parserFactory(file);
+                IParser parser = parserFactory(file.getNameForParse());
                 if (parser != null) {
-                    texts.add(parser.parse(file));
+                    texts.add(parser.parse(file.getNameForParse()));
                     searchParams.add(searchParam);
-                    returnedFiles.add(file);
+                    returnedFiles.add(file.getFileName());
                 }
             }
             catch (Exception e){

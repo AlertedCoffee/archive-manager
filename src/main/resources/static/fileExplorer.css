@@ -47,6 +47,10 @@ header {
     background-size: cover;
 }
 
+.search-container button[type=submit]:disabled, button[disabled] {
+    cursor: not-allowed;
+}
+
 .search-container button[type=submit]:hover {
     background-color: #cccccc;
 }

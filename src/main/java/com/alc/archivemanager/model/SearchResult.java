@@ -1,5 +1,11 @@
 package com.alc.archivemanager.model;
 
+import com.alc.archivemanager.config.FilePaths;
+import com.alc.archivemanager.parsers.IParser;
+import com.alc.archivemanager.searchers.SearchProcesses;
+import com.google.common.io.Files;
+import lombok.Getter;
+
 public class SearchResult {
     public String FileName;
     public String Answer;
@@ -7,14 +13,20 @@ public class SearchResult {
 
     public String PageText;
 
-    public double getCoincidence() {
-        return Coincidence;
-    }
     public String getShortFileName(){
         int index = FileName.indexOf("storage") + 8;
         return FileName.substring(index, FileName.lastIndexOf('.'));
     }
 
+    public String getPath(){
+        if(Files.getFileExtension(FileName).equals(SearchProcesses.PDF)) {
+            int index = FileName.indexOf(FilePaths.STORAGE_SUFFIX);
+            return index != -1 ? FileName.substring(index) : null;
+        }
+        else return null;
+    }
+
+    @Getter
     public double Coincidence;
 
 

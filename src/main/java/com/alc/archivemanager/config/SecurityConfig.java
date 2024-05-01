@@ -34,11 +34,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").authenticated()
-                        .requestMatchers("/trash").authenticated()
-                        .requestMatchers("/storage").authenticated()
-                        .requestMatchers("api/add_user").permitAll()
-                        .requestMatchers("api/**").authenticated()
+//                        .requestMatchers("/").authenticated()
+//                        .requestMatchers("/trash").authenticated()
+//                        .requestMatchers("/storage").authenticated()
+//                        .requestMatchers("api/add_user").permitAll()
+//                        .requestMatchers("api/**").authenticated()
 
                         .requestMatchers("/**").permitAll()
                 )

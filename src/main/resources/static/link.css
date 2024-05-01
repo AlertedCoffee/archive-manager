@@ -1,0 +1,17 @@
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  a:hover {
+    color: #b830ad;
+  }
+  
+  a:visited {
+    color: #3498db;
+  }
+  
+  a:focus {
+    outline: none;
+  }

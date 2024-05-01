@@ -1,5 +1,6 @@
 package com.alc.archivemanager.searchers;
 
+import com.alc.archivemanager.model.FileNamePairParsed;
 import com.alc.archivemanager.model.SearchResult;
 import com.alc.archivemanager.parsers.IParser;
 import com.alc.archivemanager.searchers.luceneInfrastructure.LuceneIndexer;
@@ -118,21 +119,21 @@ public class ApacheLuceneSearcher extends SearchProcesses{
         if(!dir.exists())
             return null;
 
-        List<String> files = new ArrayList<>(getContent(dir));
+        List<FileNamePairParsed> files = new ArrayList<>(getContent(dir));
 
         return searchProcess(files, searchParam);
     }
 
-    public List<SearchResult> searchProcess(List<String> files, String searchParam) {
+    public List<SearchResult> searchProcess(List<FileNamePairParsed> files, String searchParam) {
         List<SearchResult> searchResults = new ArrayList<>();
 
         List<Document> documents = new ArrayList<>();
 
-        for (String file : files){
+        for (FileNamePairParsed file : files){
             try {
-                IParser parser = parserFactory(file);
+                IParser parser = parserFactory(file.getNameForParse());
                 if (parser != null) {
-                    documents.add(createDocument(file, parser.parse(file)));
+                    documents.add(createDocument(file.getFileName(), parser.parse(file.getNameForParse())));
                 }
             }
             catch (Exception e){
