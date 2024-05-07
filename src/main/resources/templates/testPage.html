@@ -4,26 +4,91 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link th:href="@{/styles.css}" rel="stylesheet" />
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.7.1/viewer.min.css"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="/static/pdfjs-dist/build/pdf.mjs" type="module"></script>
+    <script src="/static/pdfjs-dist/web/viewer.mjs" type="module"></script>
+
+    <link rel="stylesheet" href="/static/pdfjs-dist/web/viewer.css">
 </head>
 <body>
+  
+    <canvas id="pdfCanvas"></canvas>
 
-    <a href="/ViewerJS/#../storage/ГОСТ 19.104-78.pdf">хуй</a>
-
-    <iframe src="/storage/ГОСТ 19.104-78.pdf" width="100%" height="100%" frameborder="0"></iframe>
-    <!-- <div id="document-preview">
-        <a href="/ViewerJS/#../storage/ГОСТ 19.104-78.pdf">хуй</a>
-        <img src="/storage/ГОСТ 19.104-78.pdf" alt="Document" data-src="/storage/ГОСТ 19.104-78.pdf">
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.7.1/viewer.min.js"></script>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="search()">Search</button>
+    
     <script>
-        const viewer = new Viewer(document.getElementById('document-preview'), {
-            inline: false,
-            viewed() {
-                viewer.zoomTo(1);
-            }
+    let pdfDocument = null;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      //Setting URL of the PDF document that you want to render
+      const url = '../storage/ГОСТ 19.104-78.pdf';
+
+      var { pdfjsLib } = globalThis;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/pdfjs-dist/build/pdf.worker.mjs';
+      
+      // Rendering the PDF on the canvas
+      pdfjsLib.getDocument(url).promise.then(pdf => {
+          // Loading the first page of the PDF
+          pdfDocument = pdf;
+          
+          const pageNumber = 1;
+          return pdf.getPage(pageNumber);
+        }).then(page => {
+        
+          // Setting the PDF zoom level to 100% by setting scale to 1
+          const viewport = page.getViewport({ scale: 1 });
+        
+          // Prepare canvas using PDF page dimensions
+          const canvas = document.getElementById("pdfCanvas");
+          const context = canvas.getContext("2d");
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+        
+          // Render PDF page into canvas context
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport,
+          };
+        
+          return page.render(renderContext);
         });
-    </script> -->
-</body>
-</html>
+    });
+
+    function search() {
+      const searchText = document.getElementById('searchInput').value;
+
+      // Exit if no text entered
+      if (!searchText) return;
+
+      // Remove previous highlights
+      const previousHighlights = document.querySelectorAll('.highlight');
+      previousHighlights.forEach(highlight => highlight.remove());
+
+      // Perform search
+      pdfDocument.getPage(1).then(function(page) {
+          page.getTextContent().then(function(textContent) {
+              textContent.items.forEach(function(item) {
+                  if (item.str.includes(searchText)) {
+                      const textLayerDiv = document.createElement('div');
+                      textLayerDiv.classList.add('highlight');
+                      textLayerDiv.style.position = 'absolute';
+                      textLayerDiv.style.left = (item.transform[4]) + 'px';
+                      textLayerDiv.style.bottom = (item.transform[5] - 117) + 'px';
+                      textLayerDiv.style.width = item.width + 'px';
+                      textLayerDiv.style.height = item.height + 'px';
+                      textLayerDiv.style.backgroundColor = 'rgba(255, 255, 0, 0.5)';
+                      document.getElementById('pdfCanvas').parentNode.appendChild(textLayerDiv);
+                  }
+              });
+          });
+      });
+    }
+    </script>
+    
+  </body>
+  </html>

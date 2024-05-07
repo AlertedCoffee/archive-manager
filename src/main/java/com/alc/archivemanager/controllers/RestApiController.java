@@ -69,8 +69,8 @@ public class RestApiController {
             searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
             return new ResponseEntity<>(searchResult, HttpStatus.OK);
         }
-        catch (Exception ex){
-            ex.printStackTrace();
+        catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
