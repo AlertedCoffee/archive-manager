@@ -4,6 +4,7 @@ import com.alc.archivemanager.model.DeepPavlovApiRequest;
 import com.alc.archivemanager.model.FileNamePairParsed;
 import com.alc.archivemanager.model.SearchResult;
 import com.alc.archivemanager.parsers.IParser;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.HttpEntity;
@@ -63,15 +64,18 @@ public class DeepPavlovSearcher extends SearchProcesses{
 
                         List<SearchResult> searchResults = new ArrayList<>();
 
-                        String[] findedSubString = new String[((List<?>)responseArray[0]).size()];
                         for (int i = 0; i < ((List<?>)responseArray[0]).size(); i++){
 
-                            String pattern = (String) ((List<?>) responseArray[0]).get(0);
-
-
+                            String pattern = (String) ((List<?>) responseArray[0]).get(i);
+                            String findedSubString;
                             String text = texts.get(i);
+                            int pageNumber = -666;
 
-                            int subStringCoordinate = (int)(double)((List<?>) responseArray[1]).get(0);
+                            if(Files.getFileExtension(fileNames.get(i)).equals(SearchProcesses.PDF)){
+                                pageNumber = getPage(text, pattern);
+                            }
+
+                            int subStringCoordinate = text.indexOf(pattern);
 
                             List<Integer> nIndexes = new ArrayList<>();
 
@@ -99,13 +103,14 @@ public class DeepPavlovSearcher extends SearchProcesses{
                                 }
                             }
 
-                            findedSubString[i] = text.substring(lIndex, rIndex);
+                            findedSubString = text.substring(lIndex, rIndex);
 
                             searchResults.add(
                                     new SearchResult(fileNames.get(i),
                                             (String) ((List<?>) responseArray[0]).get(i),
                                             (double) ((List<?>) responseArray[1]).get(i),
-                                            findedSubString[i],
+                                            pageNumber,
+                                            findedSubString,
                                             (double) ((List<?>) responseArray[2]).get(i))
                             );
                         }
@@ -128,6 +133,17 @@ public class DeepPavlovSearcher extends SearchProcesses{
         return answerPages[j + 1] + '\n' + answerPages[j + 2] + '\n' + answerPages[j + 3] + '\n' + answerPages[j + 4] + '\n';
 
 
+    }
+
+    private Integer getPage(String text, String template){
+        String[] answerPages = text.split("\r\n\r\n");
+        int findedIndex = 0;
+        for (int i = 0; i < answerPages.length; i++){
+            if(answerPages[i].contains(template))
+                findedIndex = i;
+        }
+
+        return  ++findedIndex;
     }
 
     @Override
