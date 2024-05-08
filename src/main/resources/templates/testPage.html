@@ -23,10 +23,11 @@
     
     <script>
     let pdfDocument = null;
+    let pageNumber = 5;
 
     document.addEventListener("DOMContentLoaded", function() {
       //Setting URL of the PDF document that you want to render
-      const url = '../storage/ГОСТ 19.104-78.pdf';
+      const url = '../storage/ГОСТ 19.106-78.pdf';
 
       var { pdfjsLib } = globalThis;
       pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/pdfjs-dist/build/pdf.worker.mjs';
@@ -35,8 +36,6 @@
       pdfjsLib.getDocument(url).promise.then(pdf => {
           // Loading the first page of the PDF
           pdfDocument = pdf;
-          
-          const pageNumber = 1;
           return pdf.getPage(pageNumber);
         }).then(page => {
         
@@ -59,35 +58,50 @@
         });
     });
 
+    
+
     function search() {
-      const searchText = document.getElementById('searchInput').value;
+    const searchText = document.getElementById('searchInput').value.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");;
 
-      // Exit if no text entered
-      if (!searchText) return;
+    // Exit if no text entered
+    if (!searchText) return;
 
-      // Remove previous highlights
-      const previousHighlights = document.querySelectorAll('.highlight');
-      previousHighlights.forEach(highlight => highlight.remove());
+    // Remove previous highlights
+    const previousHighlights = document.querySelectorAll('.highlight');
+    previousHighlights.forEach(highlight => highlight.remove());
 
-      // Perform search
-      pdfDocument.getPage(1).then(function(page) {
-          page.getTextContent().then(function(textContent) {
-              textContent.items.forEach(function(item) {
-                  if (item.str.includes(searchText)) {
-                      const textLayerDiv = document.createElement('div');
-                      textLayerDiv.classList.add('highlight');
-                      textLayerDiv.style.position = 'absolute';
-                      textLayerDiv.style.left = (item.transform[4]) + 'px';
-                      textLayerDiv.style.bottom = (item.transform[5] - 117) + 'px';
-                      textLayerDiv.style.width = item.width + 'px';
-                      textLayerDiv.style.height = item.height + 'px';
-                      textLayerDiv.style.backgroundColor = 'rgba(255, 255, 0, 0.5)';
-                      document.getElementById('pdfCanvas').parentNode.appendChild(textLayerDiv);
-                  }
-              });
-          });
-      });
-    }
+    // Perform search
+    pdfDocument.getPage(pageNumber).then(function(page) {
+        page.getTextContent().then(function(textContent) {
+            searchedItems = [];
+
+            textContent.items.forEach(function(item) {
+                const text = item.str.toLowerCase().trim();
+                let searchTerms = searchText.split(" ");
+                searchTerms.forEach(function(searchItem){
+                    
+                    if (text == searchItem) {
+                        searchedItems.push(item);
+                    }
+
+                });
+            });
+            
+
+            searchedItems.forEach(function(item){
+                const textLayerDiv = document.createElement('div');
+                textLayerDiv.classList.add('highlight');
+                textLayerDiv.style.position = 'absolute';
+                textLayerDiv.style.left = (item.transform[4]) + 'px';
+                textLayerDiv.style.bottom = (item.transform[5] - 117) + 'px';
+                textLayerDiv.style.width = item.width + 'px';
+                textLayerDiv.style.height = item.height + 'px';
+                textLayerDiv.style.backgroundColor = 'rgba(255, 255, 0, 0.5)';
+                document.getElementById('pdfCanvas').parentNode.appendChild(textLayerDiv);
+            });
+        });
+    });
+}
     </script>
     
   </body>
