@@ -34,6 +34,12 @@ public class ArchiveUserDetails implements UserDetails {
         return user.getRoles().split(", ");
     }
 
+    public ArchiveUser getUser(){
+        ArchiveUser result = user;
+        result.setPassword("");
+        return result;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

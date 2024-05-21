@@ -2,7 +2,6 @@ package com.alc.archivemanager.controllers;
 
 import com.alc.archivemanager.config.ArchiveUserDetails;
 import com.alc.archivemanager.model.*;
-import com.alc.archivemanager.repository.UserRepository;
 import com.alc.archivemanager.searchers.ApacheLuceneSearcher;
 import com.alc.archivemanager.searchers.ComboSearcher;
 import com.alc.archivemanager.searchers.DeepPavlovSearcher;
@@ -11,21 +10,15 @@ import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.servises.ArchiveUserService;
 import com.alc.archivemanager.util.FileUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,14 +31,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class RestApiController {
-
-    @Autowired
-    ArchiveUserService archiveUserService;
-
-    @GetMapping("/user_info")
-    public String[] userInfo(HttpServletRequest request){
-        return ((ArchiveUserDetails)((Authentication)request.getUserPrincipal()).getPrincipal()).getRoles();
-    }
 
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam(name = "method", required = false) String method,
@@ -248,15 +233,5 @@ public class RestApiController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    @PostMapping("/add_user")
-    public String addUser(@RequestBody ArchiveUser user){
-        return archiveUserService.addUser(user);
-    }
-
-    @GetMapping("/get_users")
-    public List<ArchiveUser> getUsers(){
-        return archiveUserService.getAll();
     }
 }

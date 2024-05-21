@@ -1,0 +1,25 @@
+.nav-menu {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+    z-index: 1;
+    top: 40px;
+}
+
+.dropdown-menu a {
+    color: white;
+    padding: 12px 46px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-menu a:hover {
+    background-color: #575757;
+}

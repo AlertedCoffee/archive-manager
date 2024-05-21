@@ -21,11 +21,8 @@ public class SearchResult {
     }
 
     public String getPath(){
-        if(Files.getFileExtension(FileName).equals(SearchProcesses.PDF)) {
-            int index = FileName.indexOf(FilePaths.STORAGE_SUFFIX);
-            return index != -1 ? FileName.substring(index) : null;
-        }
-        else return null;
+        int index = FileName.indexOf(FilePaths.STORAGE_SUFFIX);
+        return index != -1 ? FileName.substring(index) : null;
     }
 
     @Getter

@@ -7,12 +7,24 @@
     <link th:href="@{/addFile.css}" rel="stylesheet" />
     <link th:href="@{/popupError.css}" rel="stylesheet" />
     <link th:href="@{/link.css}" rel="stylesheet" />
+    <link th:href="@{/navMenu.css}" rel="stylesheet" />
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/scripts/popupError.js}"></script>
     <script th:src="@{/scripts/search.js}"></script>
+    <script th:src="@{/scripts/navMenu.js}"></script>
 </head>
 <body onload="start()">
 <header class="header">
+    <div class="nav-menu">
+        <button class="nav-btn nav-menu-ico" onclick="toggleMenu()"></button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <a href="/user">Логин</a>
+            <a href="/">Файлы</a>
+            <a href="/trash">Корзина</a>
+            <a href="/logout">Выход</a>
+        </div>
+    </div>
     <div>
         <button class="nav-btn upload-ico" id="upload-btn" onclick="showForm('upload_overlay')"></button>
         <button class="nav-btn create-folder-ico" id="create-folder-btn" onclick="showForm('create_folder_overlay')"></button>

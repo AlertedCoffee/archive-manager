@@ -31,9 +31,3 @@
     display: flex;
     justify-content: space-between;
 }
-
-#remove-select-btn{
-    position: absolute;
-    left: 10px;
-    top: auto;
-}

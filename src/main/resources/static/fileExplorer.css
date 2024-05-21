@@ -120,6 +120,12 @@ tbody tr:hover {
     background-image: url('/icons/cross.png');
 }
 
+#remove-select-btn{
+    position: absolute;
+    left: 15px;
+    top: auto;
+}
+
 .edit-ico{
     background-image: url('/icons/edit.png');
 }
@@ -138,6 +144,10 @@ tbody tr:hover {
 
 .neuro-ico{
     background-image: url('/icons/neuro.png');
+}
+
+.nav-menu-ico{
+    background-image: url('/icons/menu.png');
 }
 
 .disp-none{

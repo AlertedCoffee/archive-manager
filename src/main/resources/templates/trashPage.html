@@ -6,11 +6,23 @@
     <link th:href="@{/fileExplorer.css}" rel="stylesheet" />
     <link th:href="@{/addFile.css}" rel="stylesheet" />
     <link th:href="@{/popupError.css}" rel="stylesheet" />
+    <link th:href="@{/navMenu.css}" rel="stylesheet" />
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script th:src="@{/scripts/popupError.js}"></script>
+    <script th:src="@{/scripts/navMenu.js}"></script>
 </head>
 <body onload="start()">
 <header class="header">
+    <div class="nav-menu">
+        <button class="nav-btn nav-menu-ico" onclick="toggleMenu()"></button>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <a href="/user">Профиль</a>
+            <a href="/">Файлы</a>
+            <a href="/trash">Корзина</a>
+            <a href="/logout">Выход</a>
+        </div>
+    </div>
     <div>
         <button class="nav-btn recover-ico disp-none" id="recover-btn" onclick="recoverItems()" ></button>
         <button class="nav-btn delete-all-ico" id="delete-all-btn" onclick="deleteAll()" ></button>

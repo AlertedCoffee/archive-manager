@@ -14,17 +14,22 @@ import java.util.List;
 public class FileSystemController {
 
     @GetMapping("/")
-    public String index(Model model){
+    public String index(){
         return "fileSystemPage";
-    }
-
-    @GetMapping("/uploadForm")
-    public String uploadForm(){
-        return "uploadForm";
     }
 
     @GetMapping("/trash")
     public String trash() {
         return "trashPage";
+    }
+
+    @GetMapping("/user")
+    public String userPage() {
+        return "userPage";
+    }
+
+    @GetMapping("/test")
+    public String test() throws Exception {
+        return "/testPage";
     }
 }
