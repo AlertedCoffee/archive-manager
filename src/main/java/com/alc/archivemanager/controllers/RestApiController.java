@@ -34,7 +34,7 @@ public class RestApiController {
 
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam(name = "method", required = false) String method,
-                                                     @RequestParam("search_param") String search_param,
+                                                     @RequestParam("search_param") String searchParam,
                                                      @RequestParam("destination") String destination
     ) throws Exception {
 
@@ -42,7 +42,7 @@ public class RestApiController {
         if(destination.contains("..") || !destination.contains(FilePaths.STORAGE_SUFFIX)) return new ResponseEntity<>("Отказано в доступе", HttpStatus.LOCKED);
 
         try {
-            if (search_param == null || search_param.isEmpty()) throw new Exception("Параметр поиска не задан");
+            if (searchParam == null || searchParam.isEmpty()) throw new Exception("Параметр поиска не задан");
 
             ISearcher searcher = switch (method) {
                 case "neural" -> new DeepPavlovSearcher();
@@ -50,7 +50,7 @@ public class RestApiController {
                 default -> new ApacheLuceneSearcher();
             };
 
-            List<SearchResult> searchResult = searcher.searchProcess(FilePaths.MAIN_PATH + destination, search_param);
+            List<SearchResult> searchResult = searcher.searchProcess(FilePaths.MAIN_PATH + destination, searchParam);
             searchResult.sort(Comparator.comparingDouble(SearchResult::getCoincidence).reversed());
             return new ResponseEntity<>(searchResult, HttpStatus.OK);
         }
