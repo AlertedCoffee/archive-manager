@@ -13,8 +13,6 @@ import java.io.File;
 
 @SpringBootApplication
 public class ArchiveManagerApplication extends SpringBootServletInitializer {
-	@Value("${upload.path}")
-	private String uploadPath;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ArchiveManagerApplication.class, args);

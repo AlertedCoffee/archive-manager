@@ -1,5 +1,6 @@
 package com.alc.archivemanager.controllers;
 
+import com.alc.archivemanager.config.FilePaths;
 import com.alc.archivemanager.model.FileSystemItem;
 import com.alc.archivemanager.util.FileUtil;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,10 +27,5 @@ public class FileSystemController {
     @GetMapping("/user")
     public String userPage() {
         return "userPage";
-    }
-
-    @GetMapping("/test")
-    public String test() throws Exception {
-        return "/testPage";
     }
 }
