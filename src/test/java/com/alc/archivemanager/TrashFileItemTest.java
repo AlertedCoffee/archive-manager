@@ -19,24 +19,39 @@ public class TrashFileItemTest {
         file.createNewFile();
         FileUtil.moveToTrashFile(file);
 
+        File trashFile = new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName());
+        TrashFileItem trashFileItem = new TrashFileItem(trashFile);
 
-        TrashFileItem trashFileItem = new TrashFileItem(new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName()));
+        FileUtil.deleteFileFromTrash(trashFile);
+
 
         assertThat(trashFileItem.getName()).isEqualTo("test.pdf");
     }
 
     @Test
     void getNameTest() throws IOException {
-        File file = new File(FilePaths.TRASH_SUFFIX + "/test.pdf");
-        TrashFileItem trashFileItem = new TrashFileItem(file);
+        File file = new File(FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX + "/test.pdf");
+        file.createNewFile();
+        FileUtil.moveToTrashFile(file);
+
+        File trashFile = new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName());
+        TrashFileItem trashFileItem = new TrashFileItem(trashFile);
+
+        FileUtil.deleteFileFromTrash(trashFile);
 
         assertThat(trashFileItem.getName()).isEqualTo("test.pdf");
     }
 
     @Test
     void getNameWithTwoPlusPartsTest() throws IOException {
-        File file = new File(FilePaths.TRASH_SUFFIX + "/f7cb5222-32a2-4ab0-93fe-50b96e8067cc.asd.test.pdf");
-        TrashFileItem trashFileItem = new TrashFileItem(file);
+        File file = new File(FilePaths.MAIN_PATH + FilePaths.STORAGE_SUFFIX + "/f7cb5222-32a2-4ab0-93fe-50b96e8067cc.asd.test.pdf");
+        file.createNewFile();
+        FileUtil.moveToTrashFile(file);
+
+        File trashFile = new File(FilePaths.MAIN_PATH + FilePaths.TRASH_SUFFIX, file.getName());
+        TrashFileItem trashFileItem = new TrashFileItem(trashFile);
+
+        FileUtil.deleteFileFromTrash(trashFile);
 
         assertThat(trashFileItem.getName()).isEqualTo("asd.test.pdf");
     }

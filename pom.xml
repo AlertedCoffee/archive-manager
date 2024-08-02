@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.alc</groupId>
 	<artifactId>archive-manager</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>archive-manager</name>
 	<description>archive explorer</description>
 	<properties>
@@ -69,20 +69,8 @@
 <!--       Docx             -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>5.2.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.5</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.docx4j</groupId>
-			<artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
-			<version>11.4.9</version>
 		</dependency>
 
 <!--       Docx             -->
@@ -147,7 +135,7 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>6.2.1</version>
+			<version>6.3.0</version>
 		</dependency>
 
 		<dependency>
