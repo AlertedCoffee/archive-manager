@@ -15,7 +15,7 @@ The application serves as a [cloud storage](https://i.imgur.com/XXlISiE.png) whe
 ![File management panel](https://i.imgur.com/CWZY3Ww.png)
 + Secure deletion to the recycle bin.
 ![Recycle bin](https://i.imgur.com/a4nCS8K.png)
-+ Authorization system using SpringSecurity (Don't forget to configure access through <code>SecurityConfig.java</code>. In the repository, it is commented out)
++ Authorization system using SpringSecurity (Don't forget to configure access through <code>SecurityConfig.java</code>. In the repository, it is commented out) <br>
 ![Authorization](https://i.imgur.com/EBIhtGh.png)
 
 Admin user initialization:
